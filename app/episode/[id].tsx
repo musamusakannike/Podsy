@@ -1,14 +1,15 @@
 "use client"
 
-import { View, ScrollView, Image, TouchableOpacity, ActivityIndicator } from "react-native"
+import { View, ScrollView, Image, ActivityIndicator } from "react-native"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
 import { useEpisode } from "@/hooks/use-podcasts"
 import { ArrowLeft, Play, Pause, Heart, Share2, Clock } from "lucide-react-native"
-import Animated, { FadeIn } from "react-native-reanimated"
+import Animated, { FadeInUp } from "react-native-reanimated"
 import { usePlayer } from "@/contexts/player-context"
+import { HapticPressable } from "@/components/ui/pressable"
 
 export default function EpisodeScreen() {
   const { id } = useLocalSearchParams()
@@ -54,11 +55,11 @@ export default function EpisodeScreen() {
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="px-6 pb-6">
-          <TouchableOpacity onPress={() => router.back()} className="mb-6">
+          <HapticPressable onPress={() => router.back()} className="mb-6" haptic="selection">
             <ArrowLeft size={24} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-          </TouchableOpacity>
+          </HapticPressable>
 
-          <Animated.View entering={FadeIn} className="items-center">
+          <Animated.View entering={FadeInUp} className="items-center">
             <Image source={{ uri: episode?.images[0]?.url }} className="w-64 h-64 rounded-2xl mb-6" />
 
             <Text className="text-2xl font-bold text-center mb-2">{episode?.name}</Text>
@@ -74,11 +75,8 @@ export default function EpisodeScreen() {
             </View>
 
             {/* Action Buttons */}
-            <View className="flex-row gap-4 mb-6">
-              <TouchableOpacity
-                onPress={handlePlayPause}
-                className="bg-primary px-8 py-3 rounded-full flex-row items-center"
-              >
+            <Animated.View entering={FadeInUp.delay(60)} className="flex-row gap-4 mb-6">
+              <HapticPressable onPress={handlePlayPause} className="bg-primary px-8 py-3 rounded-full flex-row items-center" haptic="heavy">
                 {currentEpisode?.id === episode?.id && isPlaying ? (
                   <Pause size={20} color="rgb(10, 10, 10)" fill="rgb(10, 10, 10)" />
                 ) : (
@@ -87,20 +85,16 @@ export default function EpisodeScreen() {
                 <Text className="text-primary-foreground font-semibold ml-2">
                   {currentEpisode?.id === episode?.id && isPlaying ? "Pause" : "Play"}
                 </Text>
-              </TouchableOpacity>
+              </HapticPressable>
 
-              <TouchableOpacity
-                className={`${theme === "dark" ? "bg-card" : "bg-card"} w-12 h-12 rounded-full items-center justify-center border ${theme === "dark" ? "border-border" : "border-border"}`}
-              >
+              <HapticPressable className={`${theme === "dark" ? "bg-card" : "bg-card"} w-12 h-12 rounded-full items-center justify-center border ${theme === "dark" ? "border-border" : "border-border"}`} haptic="light">
                 <Heart size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-              </TouchableOpacity>
+              </HapticPressable>
 
-              <TouchableOpacity
-                className={`${theme === "dark" ? "bg-card" : "bg-card"} w-12 h-12 rounded-full items-center justify-center border ${theme === "dark" ? "border-border" : "border-border"}`}
-              >
+              <HapticPressable className={`${theme === "dark" ? "bg-card" : "bg-card"} w-12 h-12 rounded-full items-center justify-center border ${theme === "dark" ? "border-border" : "border-border"}`} haptic="light">
                 <Share2 size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-              </TouchableOpacity>
-            </View>
+              </HapticPressable>
+            </Animated.View>
 
             {/* Description */}
             <View className="w-full">

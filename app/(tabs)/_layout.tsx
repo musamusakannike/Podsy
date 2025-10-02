@@ -5,6 +5,7 @@ import { Home, Search, Library, User } from "lucide-react-native";
 import { useTheme } from "@/contexts/theme-context";
 import { MiniPlayer } from "@/components/mini-player";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Haptics from "expo-haptics";
 
 export default function TabsLayout() {
   const { theme } = useTheme();
@@ -25,6 +26,12 @@ export default function TabsLayout() {
           },
           tabBarActiveTintColor: activeColor,
           tabBarInactiveTintColor: iconColor,
+        }}
+        screenListeners={{
+          tabPress: () => {
+            // fire-and-forget; ignore failures
+            Haptics.selectionAsync().catch(() => {})
+          },
         }}
       >
         <Tabs.Screen

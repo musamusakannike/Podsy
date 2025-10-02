@@ -1,6 +1,6 @@
 "use client"
 
-import { View, Image, TouchableOpacity } from "react-native"
+import { View, Image } from "react-native"
 import { useRouter } from "expo-router"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
@@ -14,6 +14,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated"
 import { useEffect } from "react"
+import { HapticPressable } from "@/components/ui/pressable"
 
 export function MiniPlayer() {
   const { theme } = useTheme()
@@ -44,9 +45,10 @@ export function MiniPlayer() {
         <Animated.View style={progressStyle} className="h-full bg-primary" />
       </View>
 
-      <TouchableOpacity
+      <HapticPressable
         onPress={() => router.push(`/episode/${currentEpisode.id}`)}
         className="flex-row items-center px-4 py-3"
+        haptic="selection"
       >
         <Image source={{ uri: currentEpisode.images[0]?.url }} className="w-12 h-12 rounded-lg" />
 
@@ -60,9 +62,10 @@ export function MiniPlayer() {
         </View>
 
         <View className="flex-row items-center gap-2">
-          <TouchableOpacity
+          <HapticPressable
             onPress={isPlaying ? pauseEpisode : resumeEpisode}
             className="w-10 h-10 items-center justify-center"
+            haptic="light"
           >
             {isPlaying ? (
               <Pause
@@ -77,13 +80,13 @@ export function MiniPlayer() {
                 fill={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"}
               />
             )}
-          </TouchableOpacity>
+          </HapticPressable>
 
-          <TouchableOpacity onPress={stopEpisode} className="w-10 h-10 items-center justify-center">
+          <HapticPressable onPress={stopEpisode} className="w-10 h-10 items-center justify-center" haptic="light">
             <X size={20} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
-          </TouchableOpacity>
+          </HapticPressable>
         </View>
-      </TouchableOpacity>
+      </HapticPressable>
     </Animated.View>
   )
 }

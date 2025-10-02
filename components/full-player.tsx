@@ -1,6 +1,6 @@
 "use client"
 
-import { View, Image, TouchableOpacity, Dimensions } from "react-native"
+import { View, Image, Dimensions } from "react-native"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
 import { usePlayer } from "@/contexts/player-context"
@@ -8,6 +8,7 @@ import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle, Heart, Share2, Che
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { useEffect } from "react"
 import Slider from "@react-native-community/slider"
+import { HapticPressable } from "@/components/ui/pressable"
 
 const { width } = Dimensions.get("window")
 
@@ -41,13 +42,13 @@ export function FullPlayer({ onClose }: FullPlayerProps) {
     <View className={`flex-1 ${theme === "dark" ? "bg-background" : "bg-background"} px-6 `}>
       {/* Header */}
       <View className="flex-row items-center justify-between mb-8">
-        <TouchableOpacity onPress={onClose}>
+        <HapticPressable onPress={onClose} haptic="selection">
           <ChevronDown size={28} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-        </TouchableOpacity>
+        </HapticPressable>
         <Text className="text-sm font-medium">Now Playing</Text>
-        <TouchableOpacity>
+        <HapticPressable haptic="light">
           <Share2 size={24} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-        </TouchableOpacity>
+        </HapticPressable>
       </View>
 
       {/* Album Art */}
@@ -92,39 +93,40 @@ export function FullPlayer({ onClose }: FullPlayerProps) {
 
       {/* Controls */}
       <View className="flex-row items-center justify-between mb-8">
-        <TouchableOpacity>
+        <HapticPressable haptic="selection">
           <Shuffle size={24} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
-        </TouchableOpacity>
+        </HapticPressable>
 
-        <TouchableOpacity>
+        <HapticPressable haptic="light">
           <SkipBack size={32} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-        </TouchableOpacity>
+        </HapticPressable>
 
-        <TouchableOpacity
+        <HapticPressable
           onPress={isPlaying ? pauseEpisode : resumeEpisode}
           className="w-20 h-20 bg-primary rounded-full items-center justify-center"
+          haptic="heavy"
         >
           {isPlaying ? (
             <Pause size={36} color="rgb(10, 10, 10)" fill="rgb(10, 10, 10)" />
           ) : (
             <Play size={36} color="rgb(10, 10, 10)" fill="rgb(10, 10, 10)" />
           )}
-        </TouchableOpacity>
+        </HapticPressable>
 
-        <TouchableOpacity>
+        <HapticPressable haptic="light">
           <SkipForward size={32} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-        </TouchableOpacity>
+        </HapticPressable>
 
-        <TouchableOpacity>
+        <HapticPressable haptic="selection">
           <Repeat size={24} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
-        </TouchableOpacity>
+        </HapticPressable>
       </View>
 
       {/* Bottom Actions */}
       <View className="flex-row items-center justify-center">
-        <TouchableOpacity className="w-12 h-12 items-center justify-center">
+        <HapticPressable className="w-12 h-12 items-center justify-center" haptic="light">
           <Heart size={24} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-        </TouchableOpacity>
+        </HapticPressable>
       </View>
     </View>
   )

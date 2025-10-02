@@ -1,6 +1,6 @@
 "use client"
 
-import { View, ScrollView, TextInput, TouchableOpacity, Image, ActivityIndicator } from "react-native"
+import { View, ScrollView, TextInput, Image, ActivityIndicator } from "react-native"
 import { useState } from "react"
 import { useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
@@ -9,6 +9,7 @@ import { useTheme } from "@/contexts/theme-context"
 import { useSearchPodcasts } from "@/hooks/use-podcasts"
 import { Search as SearchIcon, X } from "lucide-react-native"
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
+import { HapticPressable } from "@/components/ui/pressable"
 
 export default function SearchScreen() {
   const [query, setQuery] = useState("")
@@ -37,9 +38,9 @@ export default function SearchScreen() {
             className={`flex-1 ml-3 ${theme === "dark" ? "text-foreground" : "text-foreground"}`}
           />
           {query.length > 0 && (
-            <TouchableOpacity onPress={() => setQuery("")}>
+            <HapticPressable onPress={() => setQuery("")} haptic="light">
               <X size={20} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
-            </TouchableOpacity>
+            </HapticPressable>
           )}
         </View>
       </View>
@@ -50,13 +51,14 @@ export default function SearchScreen() {
             <Text className="text-lg font-semibold mb-4">Popular Searches</Text>
             <View className="flex-row flex-wrap gap-2">
               {popularSearches.map((search) => (
-                <TouchableOpacity
+                <HapticPressable
                   key={search}
                   onPress={() => setQuery(search)}
                   className={`${theme === "dark" ? "bg-card" : "bg-card"} px-4 py-2 rounded-full border ${theme === "dark" ? "border-border" : "border-border"}`}
+                  haptic="selection"
                 >
                   <Text className="text-sm">{search}</Text>
-                </TouchableOpacity>
+                </HapticPressable>
               ))}
             </View>
           </View>
@@ -67,10 +69,11 @@ export default function SearchScreen() {
         ) : results && results.length > 0 ? (
           <Animated.View entering={FadeIn} exiting={FadeOut} className="px-6">
             {results.map((podcast: any) => (
-              <TouchableOpacity
+              <HapticPressable
                 key={podcast.id}
                 onPress={() => router.push(`/podcast/${podcast.id}`)}
                 className={`flex-row mb-4 ${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-3 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                haptic="light"
               >
                 <Image source={{ uri: podcast.images[0]?.url }} className="w-20 h-20 rounded-lg" />
                 <View className="flex-1 ml-3 justify-center">
@@ -82,7 +85,7 @@ export default function SearchScreen() {
                   </Text>
                   <Text className="text-xs text-muted-foreground mt-1">{podcast.total_episodes} episodes</Text>
                 </View>
-              </TouchableOpacity>
+              </HapticPressable>
             ))}
           </Animated.View>
         ) : (

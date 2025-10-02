@@ -1,13 +1,14 @@
 "use client"
 
-import { View, ScrollView, TouchableOpacity, Image, ActivityIndicator } from "react-native"
+import { View, ScrollView, Image, ActivityIndicator } from "react-native"
 import { useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
 import { useSavedShows } from "@/hooks/use-podcasts"
 import { BookMarked, Download, Clock } from "lucide-react-native"
-import Animated, { FadeIn } from "react-native-reanimated"
+import Animated, { FadeIn, FadeInUp } from "react-native-reanimated"
+import { HapticPressable } from "@/components/ui/pressable"
 
 export default function LibraryScreen() {
   const router = useRouter()
@@ -23,29 +24,38 @@ export default function LibraryScreen() {
 
           {/* Quick Actions */}
           <View className="flex-row gap-3 mb-6">
-            <TouchableOpacity
-              className={`flex-1 ${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"}`}
-            >
-              <BookMarked size={24} color="rgb(34, 197, 94)" />
-              <Text className="font-semibold mt-2">Saved</Text>
-              <Text className="text-xs text-muted-foreground mt-1">{savedShows?.length || 0} shows</Text>
-            </TouchableOpacity>
+            <Animated.View entering={FadeInUp} className="flex-1">
+              <HapticPressable
+                className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                haptic="selection"
+              >
+                <BookMarked size={24} color="rgb(34, 197, 94)" />
+                <Text className="font-semibold mt-2">Saved</Text>
+                <Text className="text-xs text-muted-foreground mt-1">{savedShows?.length || 0} shows</Text>
+              </HapticPressable>
+            </Animated.View>
 
-            <TouchableOpacity
-              className={`flex-1 ${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"}`}
-            >
-              <Download size={24} color="rgb(34, 197, 94)" />
-              <Text className="font-semibold mt-2">Downloads</Text>
-              <Text className="text-xs text-muted-foreground mt-1">0 episodes</Text>
-            </TouchableOpacity>
+            <Animated.View entering={FadeInUp.delay(50)} className="flex-1">
+              <HapticPressable
+                className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                haptic="selection"
+              >
+                <Download size={24} color="rgb(34, 197, 94)" />
+                <Text className="font-semibold mt-2">Downloads</Text>
+                <Text className="text-xs text-muted-foreground mt-1">0 episodes</Text>
+              </HapticPressable>
+            </Animated.View>
 
-            <TouchableOpacity
-              className={`flex-1 ${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"}`}
-            >
-              <Clock size={24} color="rgb(34, 197, 94)" />
-              <Text className="font-semibold mt-2">History</Text>
-              <Text className="text-xs text-muted-foreground mt-1">Recent</Text>
-            </TouchableOpacity>
+            <Animated.View entering={FadeInUp.delay(100)} className="flex-1">
+              <HapticPressable
+                className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                haptic="selection"
+              >
+                <Clock size={24} color="rgb(34, 197, 94)" />
+                <Text className="font-semibold mt-2">History</Text>
+                <Text className="text-xs text-muted-foreground mt-1">Recent</Text>
+              </HapticPressable>
+            </Animated.View>
           </View>
         </View>
 
@@ -59,23 +69,25 @@ export default function LibraryScreen() {
             </View>
           ) : savedShows && savedShows.length > 0 ? (
             <Animated.View entering={FadeIn}>
-              {savedShows.map((item: any) => (
-                <TouchableOpacity
-                  key={item.show.id}
-                  onPress={() => router.push(`/podcast/${item.show.id}`)}
-                  className={`flex-row mb-4 ${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-3 border ${theme === "dark" ? "border-border" : "border-border"}`}
-                >
-                  <Image source={{ uri: item.show.images[0]?.url }} className="w-20 h-20 rounded-lg" />
-                  <View className="flex-1 ml-3 justify-center">
-                    <Text className="font-semibold text-base" numberOfLines={2}>
-                      {item.show.name}
-                    </Text>
-                    <Text className="text-sm text-muted-foreground mt-1" numberOfLines={1}>
-                      {item.show.publisher}
-                    </Text>
-                    <Text className="text-xs text-muted-foreground mt-1">{item.show.total_episodes} episodes</Text>
-                  </View>
-                </TouchableOpacity>
+              {savedShows.map((item: any, i: number) => (
+                <Animated.View key={item.show.id} entering={FadeInUp.delay(i * 40)}>
+                  <HapticPressable
+                    onPress={() => router.push(`/podcast/${item.show.id}`)}
+                    className={`flex-row mb-4 ${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-3 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                    haptic="light"
+                  >
+                    <Image source={{ uri: item.show.images[0]?.url }} className="w-20 h-20 rounded-lg" />
+                    <View className="flex-1 ml-3 justify-center">
+                      <Text className="font-semibold text-base" numberOfLines={2}>
+                        {item.show.name}
+                      </Text>
+                      <Text className="text-sm text-muted-foreground mt-1" numberOfLines={1}>
+                        {item.show.publisher}
+                      </Text>
+                      <Text className="text-xs text-muted-foreground mt-1">{item.show.total_episodes} episodes</Text>
+                    </View>
+                  </HapticPressable>
+                </Animated.View>
               ))}
             </Animated.View>
           ) : (

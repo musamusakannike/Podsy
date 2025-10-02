@@ -7,6 +7,8 @@ import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
 import { Music } from "lucide-react-native"
+import { HapticPressable } from "@/components/ui/pressable"
+import Animated, { FadeInUp } from "react-native-reanimated"
 
 export default function AuthScreen() {
   const [clientId, setClientId] = useState("")
@@ -32,13 +34,13 @@ export default function AuthScreen() {
 
   return (
     <Container className="flex-1 justify-center px-6">
-      <View className="items-center mb-12">
+      <Animated.View entering={FadeInUp} className="items-center mb-12">
         <View className="w-20 h-20 bg-primary rounded-full items-center justify-center mb-4">
           <Music size={40} color={theme === "dark" ? "rgb(10, 10, 10)" : "rgb(255, 255, 255)"} />
         </View>
         <Text className="text-3xl font-bold text-center mb-2">Podcast App</Text>
         <Text className="text-muted-foreground text-center">Powered by Spotify API</Text>
-      </View>
+      </Animated.View>
 
       <View className="gap-4">
         <View>
@@ -64,13 +66,13 @@ export default function AuthScreen() {
           />
         </View>
 
-        <TouchableOpacity onPress={handleAuth} className="bg-primary py-4 rounded-lg mt-4">
+        <HapticPressable onPress={handleAuth} className="bg-primary py-4 rounded-lg mt-4" haptic="medium">
           <Text className="text-primary-foreground text-center font-semibold text-base">Continue</Text>
-        </TouchableOpacity>
+        </HapticPressable>
 
-        <TouchableOpacity onPress={() => router.replace("/(tabs)")} className="py-3">
+        <HapticPressable onPress={() => router.replace("/(tabs)")} className="py-3" haptic="selection">
           <Text className="text-muted-foreground text-center text-sm">Skip for now</Text>
-        </TouchableOpacity>
+        </HapticPressable>
       </View>
 
       <View className="mt-8">

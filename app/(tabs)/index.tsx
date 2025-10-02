@@ -1,12 +1,14 @@
 "use client"
 
-import { View, ScrollView, TouchableOpacity, Image, ActivityIndicator } from "react-native"
+import { View, ScrollView, Image, ActivityIndicator } from "react-native"
 import { useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
 import { useQuery } from "@tanstack/react-query"
 import { spotifyApi } from "@/lib/spotify"
 import { TrendingUp, Clock, Sparkles } from "lucide-react-native"
+import { HapticPressable } from "@/components/ui/pressable"
+import Animated, { FadeInUp } from "react-native-reanimated"
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -51,23 +53,29 @@ export default function HomeScreen() {
     },
   })
 
-  const renderPodcastCard = (podcast: any, size: "large" | "small" = "small") => (
-    <TouchableOpacity
+  const renderPodcastCard = (podcast: any, size: "large" | "small" = "small", index?: number) => (
+    <Animated.View
       key={podcast.id}
-      onPress={() => router.push(`/podcast/${podcast.id}`)}
+      entering={FadeInUp.delay((index ?? 0) * 50)}
       className={size === "large" ? "mr-4 w-48" : "mr-4 w-36"}
     >
-      <Image
-        source={{ uri: podcast.images[0]?.url }}
-        className={`${size === "large" ? "w-48 h-48" : "w-36 h-36"} rounded-lg mb-2`}
-      />
-      <Text className="font-semibold text-sm" numberOfLines={2}>
-        {podcast.name}
-      </Text>
-      <Text className="text-xs text-muted-foreground mt-1" numberOfLines={1}>
-        {podcast.publisher}
-      </Text>
-    </TouchableOpacity>
+      <HapticPressable
+        onPress={() => router.push(`/podcast/${podcast.id}`)}
+        className=""
+        haptic="selection"
+      >
+        <Image
+          source={{ uri: podcast.images[0]?.url }}
+          className={`${size === "large" ? "w-48 h-48" : "w-36 h-36"} rounded-lg mb-2`}
+        />
+        <Text className="font-semibold text-sm" numberOfLines={2}>
+          {podcast.name}
+        </Text>
+        <Text className="text-xs text-muted-foreground mt-1" numberOfLines={1}>
+          {podcast.publisher}
+        </Text>
+      </HapticPressable>
+    </Animated.View>
   )
 
   return (
@@ -80,7 +88,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Featured Section */}
-        <View className="mb-8">
+        <Animated.View entering={FadeInUp} className="mb-8">
           <View className="flex-row items-center px-6 mb-4">
             <Sparkles size={20} color="rgb(34, 197, 94)" />
             <Text className="text-xl font-bold ml-2">Featured</Text>
@@ -91,13 +99,13 @@ export default function HomeScreen() {
             </View>
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-6">
-              {featured?.map((podcast: any) => renderPodcastCard(podcast, "large"))}
+              {featured?.map((podcast: any, i: number) => renderPodcastCard(podcast, "large", i))}
             </ScrollView>
           )}
-        </View>
+        </Animated.View>
 
         {/* Trending Section */}
-        <View className="mb-8">
+        <Animated.View entering={FadeInUp.delay(100)} className="mb-8">
           <View className="flex-row items-center px-6 mb-4">
             <TrendingUp size={20} color="rgb(34, 197, 94)" />
             <Text className="text-xl font-bold ml-2">Trending Now</Text>
@@ -108,13 +116,13 @@ export default function HomeScreen() {
             </View>
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-6">
-              {trending?.map((podcast: any) => renderPodcastCard(podcast))}
+              {trending?.map((podcast: any, i: number) => renderPodcastCard(podcast, "small", i))}
             </ScrollView>
           )}
-        </View>
+        </Animated.View>
 
         {/* Recent Section */}
-        <View className="mb-8">
+        <Animated.View entering={FadeInUp.delay(200)} className="mb-8">
           <View className="flex-row items-center px-6 mb-4">
             <Clock size={20} color="rgb(34, 197, 94)" />
             <Text className="text-xl font-bold ml-2">Recently Added</Text>
@@ -125,10 +133,10 @@ export default function HomeScreen() {
             </View>
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-6">
-              {recent?.map((podcast: any) => renderPodcastCard(podcast))}
+              {recent?.map((podcast: any, i: number) => renderPodcastCard(podcast, "small", i))}
             </ScrollView>
           )}
-        </View>
+        </Animated.View>
       </ScrollView>
     </Container>
   )

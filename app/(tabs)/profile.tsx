@@ -1,10 +1,12 @@
 "use client"
 
-import { View, ScrollView, TouchableOpacity } from "react-native"
+import { View, ScrollView } from "react-native"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
 import { User, Moon, Sun, Bell, Download, Info, HelpCircle, LogOut, ChevronRight } from "lucide-react-native"
+import { HapticPressable } from "@/components/ui/pressable"
+import Animated, { FadeInUp } from "react-native-reanimated"
 export default function ProfileScreen() {
   const { theme, themeMode, setTheme } = useTheme()
 
@@ -62,9 +64,10 @@ export default function ProfileScreen() {
           <View
             className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg border ${theme === "dark" ? "border-border" : "border-border"}`}
           >
-            <TouchableOpacity
+            <HapticPressable
               onPress={() => setTheme("light")}
               className="flex-row items-center justify-between p-4 border-b border-border"
+              haptic="selection"
             >
               <View className="flex-row items-center flex-1">
                 <Sun size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
@@ -73,11 +76,12 @@ export default function ProfileScreen() {
               <View
                 className={`w-5 h-5 rounded-full border-2 ${themeMode === "light" ? "border-primary bg-primary" : "border-muted-foreground"}`}
               />
-            </TouchableOpacity>
+            </HapticPressable>
 
-            <TouchableOpacity
+            <HapticPressable
               onPress={() => setTheme("dark")}
               className="flex-row items-center justify-between p-4 border-b border-border"
+              haptic="selection"
             >
               <View className="flex-row items-center flex-1">
                 <Moon size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
@@ -86,9 +90,9 @@ export default function ProfileScreen() {
               <View
                 className={`w-5 h-5 rounded-full border-2 ${themeMode === "dark" ? "border-primary bg-primary" : "border-muted-foreground"}`}
               />
-            </TouchableOpacity>
+            </HapticPressable>
 
-            <TouchableOpacity onPress={() => setTheme("system")} className="flex-row items-center justify-between p-4">
+            <HapticPressable onPress={() => setTheme("system")} className="flex-row items-center justify-between p-4" haptic="selection">
               <View className="flex-row items-center flex-1">
                 <View className="w-5 h-5 rounded-full bg-gradient-to-r from-yellow-400 to-blue-900" />
                 <Text className="ml-3 font-medium">System Default</Text>
@@ -96,7 +100,7 @@ export default function ProfileScreen() {
               <View
                 className={`w-5 h-5 rounded-full border-2 ${themeMode === "system" ? "border-primary bg-primary" : "border-muted-foreground"}`}
               />
-            </TouchableOpacity>
+            </HapticPressable>
           </View>
         </View>
 
@@ -107,32 +111,35 @@ export default function ProfileScreen() {
             className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg border ${theme === "dark" ? "border-border" : "border-border"}`}
           >
             {settingsItems.map((item, index) => (
-              <TouchableOpacity
-                key={item.title}
-                onPress={item.onPress}
-                className={`flex-row items-center justify-between p-4 ${index < settingsItems.length - 1 ? "border-b border-border" : ""}`}
-              >
-                <View className="flex-row items-center flex-1">
-                  <item.icon size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-                  <View className="ml-3 flex-1">
-                    <Text className="font-medium">{item.title}</Text>
-                    <Text className="text-xs text-muted-foreground mt-1">{item.subtitle}</Text>
+              <Animated.View key={item.title} entering={FadeInUp.delay(index * 40)}>
+                <HapticPressable
+                  onPress={item.onPress}
+                  className={`flex-row items-center justify-between p-4 ${index < settingsItems.length - 1 ? "border-b border-border" : ""}`}
+                  haptic="selection"
+                >
+                  <View className="flex-row items-center flex-1">
+                    <item.icon size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
+                    <View className="ml-3 flex-1">
+                      <Text className="font-medium">{item.title}</Text>
+                      <Text className="text-xs text-muted-foreground mt-1">{item.subtitle}</Text>
+                    </View>
                   </View>
-                </View>
-                <ChevronRight size={20} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
-              </TouchableOpacity>
+                  <ChevronRight size={20} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
+                </HapticPressable>
+              </Animated.View>
             ))}
           </View>
         </View>
 
         {/* Logout */}
         <View className="px-6 pb-6">
-          <TouchableOpacity
+          <HapticPressable
             className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"} flex-row items-center justify-center`}
+            haptic="medium"
           >
             <LogOut size={20} color="rgb(239, 68, 68)" />
             <Text className="ml-2 font-semibold text-red-500">Log Out</Text>
-          </TouchableOpacity>
+          </HapticPressable>
         </View>
       </ScrollView>
     </Container>
