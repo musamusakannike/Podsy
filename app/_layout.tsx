@@ -23,7 +23,7 @@ export default function RootLayout() {
       <ThemeProvider>
         <SafeAreaProvider>
           <PlayerProvider>
-            <StatusBar style="light" />
+            <StatusBar style="light" backgroundColor="#111" />
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="auth" />
