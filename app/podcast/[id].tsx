@@ -5,6 +5,7 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Container } from "@/components/ui/container";
@@ -45,36 +46,36 @@ export default function PodcastScreen() {
     });
   };
 
+  const cardBg = theme === "dark" ? '#1c1c1c' : '#ffffff'
+  const borderColor = theme === "dark" ? '#262626' : '#e5e5e5'
+  const iconColor = theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"
+  const mutedIconColor = theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"
+
   if (podcastLoading || episodesLoading) {
     return (
-      <Container className="flex-1 items-center justify-center">
+      <Container style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="rgb(34, 197, 94)" />
       </Container>
     );
   }
 
   return (
-    <Container className="flex-1">
+    <Container style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="px-6 pb-6">
-          <HapticPressable onPress={() => router.back()} className="mb-6" haptic="selection">
-            <ArrowLeft
-              size={24}
-              color={
-                theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"
-              }
-            />
+        <View style={styles.header}>
+          <HapticPressable onPress={() => router.back()} style={styles.backButton} haptic="selection">
+            <ArrowLeft size={24} color={iconColor} />
           </HapticPressable>
 
-          <Animated.View entering={FadeInUp} className="items-center">
+          <Animated.View entering={FadeInUp} style={styles.podcastInfo}>
             <Image
               source={{
                 uri:
                   podcast?.images[0]?.url ||
                   "https://via.placeholder.com/300x300/1f2937/ffffff?text=No+Image",
               }}
-              className="w-56 h-56 rounded-2xl mb-6"
+              style={styles.podcastImage}
               defaultSource={{
                 uri: "https://via.placeholder.com/300x300/1f2937/ffffff?text=Loading...",
               }}
@@ -83,116 +84,99 @@ export default function PodcastScreen() {
               }
             />
 
-            <Text className="text-2xl font-bold text-center mb-2">
+            <Text size="2xl" weight="bold" style={styles.podcastTitle} numberOfLines={3}>
               {podcast?.name}
             </Text>
-            <Text className="text-muted-foreground text-center mb-4">
+            <Text variant="muted" style={styles.publisher}>
               {podcast?.publisher}
             </Text>
 
             {/* Action Buttons */}
-            <View className="flex-row gap-4 mb-6">
+            <View style={styles.actionButtons}>
               <HapticPressable
                 onPress={() => {
                   const first = episodesData?.items?.[0]
                   if (first) playEpisode(first)
                 }}
-                className="bg-primary px-8 py-3 rounded-full flex-row items-center"
+                style={styles.playButton}
                 haptic="heavy"
               >
                 <Play size={20} color="rgb(10, 10, 10)" fill="rgb(10, 10, 10)" />
-                <Text className="text-primary-foreground font-semibold ml-2">Play</Text>
+                <Text variant="primary" weight="semibold" style={styles.playText}>Play</Text>
               </HapticPressable>
 
               <HapticPressable
-                className={`${theme === "dark" ? "bg-card" : "bg-card"} w-12 h-12 rounded-full items-center justify-center border ${theme === "dark" ? "border-border" : "border-border"}`}
+                style={[styles.iconButton, { backgroundColor: cardBg, borderColor }]}
                 haptic="light"
               >
-                <Heart
-                  size={20}
-                  color={
-                    theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"
-                  }
-                />
+                <Heart size={20} color={iconColor} />
               </HapticPressable>
 
               <HapticPressable
-                className={`${theme === "dark" ? "bg-card" : "bg-card"} w-12 h-12 rounded-full items-center justify-center border ${theme === "dark" ? "border-border" : "border-border"}`}
+                style={[styles.iconButton, { backgroundColor: cardBg, borderColor }]}
                 haptic="light"
               >
-                <Share2
-                  size={20}
-                  color={
-                    theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"
-                  }
-                />
+                <Share2 size={20} color={iconColor} />
               </HapticPressable>
             </View>
 
             {/* Description */}
-            <Text className="text-sm text-muted-foreground text-center leading-relaxed mb-6">
+            <Text size="sm" variant="muted" style={styles.description}>
               {podcast?.description}
             </Text>
 
             {/* Stats */}
-            <View className="flex-row gap-6">
-              <View className="items-center">
-                <Text className="text-2xl font-bold">
+            <View style={styles.stats}>
+              <View style={styles.stat}>
+                <Text size="2xl" weight="bold">
                   {podcast?.total_episodes}
                 </Text>
-                <Text className="text-xs text-muted-foreground">Episodes</Text>
+                <Text size="xs" variant="muted">Episodes</Text>
               </View>
             </View>
           </Animated.View>
         </View>
 
         {/* Episodes List */}
-        <View className="px-6 pb-6">
-          <Text className="text-xl font-bold mb-4">Episodes</Text>
+        <View style={styles.episodesList}>
+          <Text size="xl" weight="bold" style={styles.episodesTitle}>Episodes</Text>
 
           {episodesData?.items.map((episode: any, i: number) => (
             <Animated.View key={episode.id} entering={FadeInUp.delay(i * 40)}>
               <HapticPressable
                 onPress={() => playEpisode(episode)}
-                className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 mb-3 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                style={[styles.episodeCard, { backgroundColor: cardBg, borderColor }]}
                 haptic="light"
               >
-                <View className="flex-row">
+                <View style={styles.episodeContent}>
                   <Image
                     source={{
                       uri:
                         episode.images[0]?.url ||
                         "https://via.placeholder.com/300x300/1f2937/ffffff?text=No+Image",
                     }}
-                    className="w-16 h-16 rounded-lg"
+                    style={styles.episodeImage}
                     defaultSource={{
                       uri: "https://via.placeholder.com/300x300/1f2937/ffffff?text=Loading...",
                     }}
                   />
-                  <View className="flex-1 ml-3">
-                    <Text className="font-semibold text-base mb-1" numberOfLines={2}>
+                  <View style={styles.episodeInfo}>
+                    <Text weight="semibold" size="base" style={styles.episodeName} numberOfLines={2}>
                       {episode.name}
                     </Text>
-                    <View className="flex-row items-center gap-2">
-                      <Text className="text-xs text-muted-foreground">
+                    <View style={styles.episodeMeta}>
+                      <Text size="xs" variant="muted">
                         {formatDate(episode.release_date)}
                       </Text>
-                      <View className="w-1 h-1 rounded-full bg-muted-foreground" />
-                      <View className="flex-row items-center">
-                        <Clock
-                          size={12}
-                          color={
-                            theme === "dark"
-                              ? "rgb(163, 163, 163)"
-                              : "rgb(115, 115, 115)"
-                          }
-                        />
-                        <Text className="text-xs text-muted-foreground ml-1">
+                      <View style={styles.dot} />
+                      <View style={styles.duration}>
+                        <Clock size={12} color={mutedIconColor} />
+                        <Text size="xs" variant="muted" style={styles.durationText}>
                           {formatDuration(episode.duration_ms)}
                         </Text>
                       </View>
                     </View>
-                    <Text className="text-xs text-muted-foreground mt-2" numberOfLines={2}>
+                    <Text size="xs" variant="muted" style={styles.episodeDescription} numberOfLines={2}>
                       {episode.description}
                     </Text>
                   </View>
@@ -205,3 +189,123 @@ export default function PodcastScreen() {
     </Container>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  backButton: {
+    marginBottom: 24,
+  },
+  podcastInfo: {
+    alignItems: 'center',
+  },
+  podcastImage: {
+    width: 224,
+    height: 224,
+    borderRadius: 16,
+    marginBottom: 24,
+  },
+  podcastTitle: {
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  publisher: {
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 24,
+  },
+  playButton: {
+    backgroundColor: '#22c55e',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  playText: {
+    marginLeft: 8,
+  },
+  iconButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  description: {
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  stats: {
+    flexDirection: 'row',
+    gap: 24,
+  },
+  stat: {
+    alignItems: 'center',
+  },
+  episodesList: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  episodesTitle: {
+    marginBottom: 16,
+  },
+  episodeCard: {
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+  },
+  episodeContent: {
+    flexDirection: 'row',
+  },
+  episodeImage: {
+    width: 64,
+    height: 64,
+    borderRadius: 8,
+  },
+  episodeInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  episodeName: {
+    marginBottom: 4,
+  },
+  episodeMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#a3a3a3',
+  },
+  duration: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  durationText: {
+    marginLeft: 4,
+  },
+  episodeDescription: {
+    marginTop: 8,
+  },
+})

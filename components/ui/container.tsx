@@ -4,13 +4,14 @@ import { type ViewProps } from "react-native"
 import { useTheme } from "@/contexts/theme-context"
 import { SafeAreaView } from "react-native-safe-area-context"
 
-export function Container({ className = "", style, ...props }: ViewProps) {
+export function Container({ style, ...props }: ViewProps) {
   const { theme } = useTheme()
+
+  const backgroundColor = theme === "dark" ? '#141414' : '#fafafa'
 
   return (
     <SafeAreaView
-      className={`${theme === "light" ? "light" : ""} ${theme === "dark" ? "bg-background" : "bg-background"} ${className}`}
-      style={style}
+      style={[{ backgroundColor }, style]}
       {...props}
     />
   )

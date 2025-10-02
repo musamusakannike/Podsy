@@ -1,6 +1,6 @@
 "use client"
 
-import { View, ScrollView, Image, ActivityIndicator } from "react-native"
+import { View, ScrollView, Image, ActivityIndicator, StyleSheet } from "react-native"
 import { useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
@@ -57,21 +57,20 @@ export default function HomeScreen() {
     <Animated.View
       key={podcast.id}
       entering={FadeInUp.delay((index ?? 0) * 50)}
-      className={size === "large" ? "mr-4 w-48" : "mr-4 w-36"}
+      style={size === "large" ? styles.cardLarge : styles.cardSmall}
     >
       <HapticPressable
         onPress={() => router.push(`/podcast/${podcast.id}`)}
-        className=""
         haptic="selection"
       >
         <Image
           source={{ uri: podcast.images[0]?.url }}
-          className={`${size === "large" ? "w-48 h-48" : "w-36 h-36"} rounded-lg mb-2`}
+          style={size === "large" ? styles.imageLarge : styles.imageSmall}
         />
-        <Text className="font-semibold text-sm" numberOfLines={2}>
+        <Text weight="semibold" size="sm" numberOfLines={2}>
           {podcast.name}
         </Text>
-        <Text className="text-xs text-muted-foreground mt-1" numberOfLines={1}>
+        <Text size="xs" variant="muted" style={styles.publisher} numberOfLines={1}>
           {podcast.publisher}
         </Text>
       </HapticPressable>
@@ -79,60 +78,60 @@ export default function HomeScreen() {
   )
 
   return (
-    <Container className="flex-1">
+    <Container style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="px-6 pb-6">
-          <Text className="text-3xl font-bold">Discover</Text>
-          <Text className="text-muted-foreground mt-1">Explore podcasts you&apos;ll love</Text>
+        <View style={styles.header}>
+          <Text size="3xl" weight="bold">Discover</Text>
+          <Text variant="muted" style={styles.subtitle}>Explore podcasts you&apos;ll love</Text>
         </View>
 
         {/* Featured Section */}
-        <Animated.View entering={FadeInUp} className="mb-8">
-          <View className="flex-row items-center px-6 mb-4">
+        <Animated.View entering={FadeInUp} style={styles.section}>
+          <View style={styles.sectionHeader}>
             <Sparkles size={20} color="rgb(34, 197, 94)" />
-            <Text className="text-xl font-bold ml-2">Featured</Text>
+            <Text size="xl" weight="bold" style={styles.sectionTitle}>Featured</Text>
           </View>
           {featuredLoading ? (
-            <View className="px-6">
+            <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="rgb(34, 197, 94)" />
             </View>
           ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-6">
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
               {featured?.map((podcast: any, i: number) => renderPodcastCard(podcast, "large", i))}
             </ScrollView>
           )}
         </Animated.View>
 
         {/* Trending Section */}
-        <Animated.View entering={FadeInUp.delay(100)} className="mb-8">
-          <View className="flex-row items-center px-6 mb-4">
+        <Animated.View entering={FadeInUp.delay(100)} style={styles.section}>
+          <View style={styles.sectionHeader}>
             <TrendingUp size={20} color="rgb(34, 197, 94)" />
-            <Text className="text-xl font-bold ml-2">Trending Now</Text>
+            <Text size="xl" weight="bold" style={styles.sectionTitle}>Trending Now</Text>
           </View>
           {trendingLoading ? (
-            <View className="px-6">
+            <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="rgb(34, 197, 94)" />
             </View>
           ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-6">
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
               {trending?.map((podcast: any, i: number) => renderPodcastCard(podcast, "small", i))}
             </ScrollView>
           )}
         </Animated.View>
 
         {/* Recent Section */}
-        <Animated.View entering={FadeInUp.delay(200)} className="mb-8">
-          <View className="flex-row items-center px-6 mb-4">
+        <Animated.View entering={FadeInUp.delay(200)} style={styles.section}>
+          <View style={styles.sectionHeader}>
             <Clock size={20} color="rgb(34, 197, 94)" />
-            <Text className="text-xl font-bold ml-2">Recently Added</Text>
+            <Text size="xl" weight="bold" style={styles.sectionTitle}>Recently Added</Text>
           </View>
           {recentLoading ? (
-            <View className="px-6">
+            <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="rgb(34, 197, 94)" />
             </View>
           ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-6">
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
               {recent?.map((podcast: any, i: number) => renderPodcastCard(podcast, "small", i))}
             </ScrollView>
           )}
@@ -141,3 +140,57 @@ export default function HomeScreen() {
     </Container>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  subtitle: {
+    marginTop: 4,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    marginLeft: 8,
+  },
+  loadingContainer: {
+    paddingHorizontal: 24,
+  },
+  scrollContent: {
+    paddingHorizontal: 24,
+  },
+  cardLarge: {
+    marginRight: 16,
+    width: 192,
+  },
+  cardSmall: {
+    marginRight: 16,
+    width: 144,
+  },
+  imageLarge: {
+    width: 192,
+    height: 192,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  imageSmall: {
+    width: 144,
+    height: 144,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  publisher: {
+    marginTop: 4,
+  },
+})

@@ -1,6 +1,6 @@
 "use client"
 
-import { View, TextInput, TouchableOpacity, Alert } from "react-native"
+import { View, TextInput, Alert, StyleSheet } from "react-native"
 import { useState } from "react"
 import { useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
@@ -32,51 +32,57 @@ export default function AuthScreen() {
     }
   }
 
+  const cardBg = theme === "dark" ? '#1c1c1c' : '#ffffff'
+  const borderColor = theme === "dark" ? '#262626' : '#e5e5e5'
+  const placeholderColor = theme === "dark" ? "rgb(115, 115, 115)" : "rgb(163, 163, 163)"
+  const textColor = theme === "dark" ? '#fafafa' : '#0a0a0a'
+  const musicIconColor = theme === "dark" ? "rgb(10, 10, 10)" : "rgb(255, 255, 255)"
+
   return (
-    <Container className="flex-1 justify-center px-6">
-      <Animated.View entering={FadeInUp} className="items-center mb-12">
-        <View className="w-20 h-20 bg-primary rounded-full items-center justify-center mb-4">
-          <Music size={40} color={theme === "dark" ? "rgb(10, 10, 10)" : "rgb(255, 255, 255)"} />
+    <Container style={styles.container}>
+      <Animated.View entering={FadeInUp} style={styles.header}>
+        <View style={styles.logo}>
+          <Music size={40} color={musicIconColor} />
         </View>
-        <Text className="text-3xl font-bold text-center mb-2">Podcast App</Text>
-        <Text className="text-muted-foreground text-center">Powered by Spotify API</Text>
+        <Text size="3xl" weight="bold" style={styles.title}>Podcast App</Text>
+        <Text variant="muted" style={styles.subtitle}>Powered by Spotify API</Text>
       </Animated.View>
 
-      <View className="gap-4">
+      <View style={styles.form}>
         <View>
-          <Text className="text-sm font-medium mb-2">Spotify Client ID</Text>
+          <Text size="sm" weight="semibold" style={styles.label}>Spotify Client ID</Text>
           <TextInput
             value={clientId}
             onChangeText={setClientId}
             placeholder="Enter your Client ID"
-            placeholderTextColor={theme === "dark" ? "rgb(115, 115, 115)" : "rgb(163, 163, 163)"}
-            className={`${theme === "dark" ? "bg-card text-foreground" : "bg-card text-foreground"} px-4 py-3 rounded-lg border ${theme === "dark" ? "border-border" : "border-border"}`}
+            placeholderTextColor={placeholderColor}
+            style={[styles.input, { backgroundColor: cardBg, borderColor, color: textColor }]}
           />
         </View>
 
         <View>
-          <Text className="text-sm font-medium mb-2">Spotify Client Secret</Text>
+          <Text size="sm" weight="semibold" style={styles.label}>Spotify Client Secret</Text>
           <TextInput
             value={clientSecret}
             onChangeText={setClientSecret}
             placeholder="Enter your Client Secret"
-            placeholderTextColor={theme === "dark" ? "rgb(115, 115, 115)" : "rgb(163, 163, 163)"}
+            placeholderTextColor={placeholderColor}
             secureTextEntry
-            className={`${theme === "dark" ? "bg-card text-foreground" : "bg-card text-foreground"} px-4 py-3 rounded-lg border ${theme === "dark" ? "border-border" : "border-border"}`}
+            style={[styles.input, { backgroundColor: cardBg, borderColor, color: textColor }]}
           />
         </View>
 
-        <HapticPressable onPress={handleAuth} className="bg-primary py-4 rounded-lg mt-4" haptic="medium">
-          <Text className="text-primary-foreground text-center font-semibold text-base">Continue</Text>
+        <HapticPressable onPress={handleAuth} style={styles.continueButton} haptic="medium">
+          <Text variant="primary" weight="semibold" size="base">Continue</Text>
         </HapticPressable>
 
-        <HapticPressable onPress={() => router.replace("/(tabs)")} className="py-3" haptic="selection">
-          <Text className="text-muted-foreground text-center text-sm">Skip for now</Text>
+        <HapticPressable onPress={() => router.replace("/(tabs)")} style={styles.skipButton} haptic="selection">
+          <Text variant="muted" size="sm">Skip for now</Text>
         </HapticPressable>
       </View>
 
-      <View className="mt-8">
-        <Text className="text-xs text-muted-foreground text-center leading-relaxed">
+      <View style={styles.footer}>
+        <Text size="xs" variant="muted" style={styles.footerText}>
           Get your Spotify API credentials from the Spotify Developer Dashboard. This app uses the Spotify Web API to
           fetch podcast data.
         </Text>
@@ -84,3 +90,63 @@ export default function AuthScreen() {
     </Container>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 48,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#22c55e',
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    textAlign: 'center',
+  },
+  form: {
+    gap: 16,
+  },
+  label: {
+    marginBottom: 8,
+  },
+  input: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    fontSize: 16,
+    fontFamily: 'Inter_400Regular',
+  },
+  continueButton: {
+    backgroundColor: '#22c55e',
+    paddingVertical: 16,
+    borderRadius: 8,
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  skipButton: {
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  footer: {
+    marginTop: 32,
+  },
+  footerText: {
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+})

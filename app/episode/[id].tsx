@@ -1,6 +1,6 @@
 "use client"
 
-import { View, ScrollView, Image, ActivityIndicator } from "react-native"
+import { View, ScrollView, Image, ActivityIndicator, StyleSheet } from "react-native"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
@@ -43,63 +43,68 @@ export default function EpisodeScreen() {
     }
   }
 
+  const cardBg = theme === "dark" ? '#1c1c1c' : '#ffffff'
+  const borderColor = theme === "dark" ? '#262626' : '#e5e5e5'
+  const iconColor = theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"
+  const mutedIconColor = theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"
+
   if (isLoading) {
     return (
-      <Container className="flex-1 items-center justify-center">
+      <Container style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="rgb(34, 197, 94)" />
       </Container>
     )
   }
 
   return (
-    <Container className="flex-1">
+    <Container style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="px-6 pb-6">
-          <HapticPressable onPress={() => router.back()} className="mb-6" haptic="selection">
-            <ArrowLeft size={24} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
+        <View style={styles.content}>
+          <HapticPressable onPress={() => router.back()} style={styles.backButton} haptic="selection">
+            <ArrowLeft size={24} color={iconColor} />
           </HapticPressable>
 
-          <Animated.View entering={FadeInUp} className="items-center">
-            <Image source={{ uri: episode?.images[0]?.url }} className="w-64 h-64 rounded-2xl mb-6" />
+          <Animated.View entering={FadeInUp} style={styles.episodeInfo}>
+            <Image source={{ uri: episode?.images[0]?.url }} style={styles.episodeImage} />
 
-            <Text className="text-2xl font-bold text-center mb-2">{episode?.name}</Text>
-            <Text className="text-muted-foreground text-center mb-1">{episode?.show?.name}</Text>
+            <Text size="2xl" weight="bold" style={styles.episodeTitle}>{episode?.name}</Text>
+            <Text variant="muted" style={styles.showName}>{episode?.show?.name}</Text>
 
-            <View className="flex-row items-center gap-2 mb-6">
-              <Text className="text-sm text-muted-foreground">{formatDate(episode?.release_date)}</Text>
-              <View className="w-1 h-1 rounded-full bg-muted-foreground" />
-              <View className="flex-row items-center">
-                <Clock size={14} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
-                <Text className="text-sm text-muted-foreground ml-1">{formatDuration(episode?.duration_ms)}</Text>
+            <View style={styles.metadata}>
+              <Text size="sm" variant="muted">{formatDate(episode?.release_date)}</Text>
+              <View style={styles.dot} />
+              <View style={styles.duration}>
+                <Clock size={14} color={mutedIconColor} />
+                <Text size="sm" variant="muted" style={styles.durationText}>{formatDuration(episode?.duration_ms)}</Text>
               </View>
             </View>
 
             {/* Action Buttons */}
-            <Animated.View entering={FadeInUp.delay(60)} className="flex-row gap-4 mb-6">
-              <HapticPressable onPress={handlePlayPause} className="bg-primary px-8 py-3 rounded-full flex-row items-center" haptic="heavy">
+            <Animated.View entering={FadeInUp.delay(60)} style={styles.actionButtons}>
+              <HapticPressable onPress={handlePlayPause} style={styles.playButton} haptic="heavy">
                 {currentEpisode?.id === episode?.id && isPlaying ? (
                   <Pause size={20} color="rgb(10, 10, 10)" fill="rgb(10, 10, 10)" />
                 ) : (
                   <Play size={20} color="rgb(10, 10, 10)" fill="rgb(10, 10, 10)" />
                 )}
-                <Text className="text-primary-foreground font-semibold ml-2">
+                <Text variant="primary" weight="semibold" style={styles.playText}>
                   {currentEpisode?.id === episode?.id && isPlaying ? "Pause" : "Play"}
                 </Text>
               </HapticPressable>
 
-              <HapticPressable className={`${theme === "dark" ? "bg-card" : "bg-card"} w-12 h-12 rounded-full items-center justify-center border ${theme === "dark" ? "border-border" : "border-border"}`} haptic="light">
-                <Heart size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
+              <HapticPressable style={[styles.iconButton, { backgroundColor: cardBg, borderColor }]} haptic="light">
+                <Heart size={20} color={iconColor} />
               </HapticPressable>
 
-              <HapticPressable className={`${theme === "dark" ? "bg-card" : "bg-card"} w-12 h-12 rounded-full items-center justify-center border ${theme === "dark" ? "border-border" : "border-border"}`} haptic="light">
-                <Share2 size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
+              <HapticPressable style={[styles.iconButton, { backgroundColor: cardBg, borderColor }]} haptic="light">
+                <Share2 size={20} color={iconColor} />
               </HapticPressable>
             </Animated.View>
 
             {/* Description */}
-            <View className="w-full">
-              <Text className="text-lg font-semibold mb-3">About this episode</Text>
-              <Text className="text-sm text-muted-foreground leading-relaxed">{episode?.description}</Text>
+            <View style={styles.descriptionSection}>
+              <Text size="lg" weight="semibold" style={styles.descriptionTitle}>About this episode</Text>
+              <Text size="sm" variant="muted" style={styles.description}>{episode?.description}</Text>
             </View>
           </Animated.View>
         </View>
@@ -107,3 +112,90 @@ export default function EpisodeScreen() {
     </Container>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  backButton: {
+    marginBottom: 24,
+  },
+  episodeInfo: {
+    alignItems: 'center',
+  },
+  episodeImage: {
+    width: 256,
+    height: 256,
+    borderRadius: 16,
+    marginBottom: 24,
+  },
+  episodeTitle: {
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  showName: {
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  metadata: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 24,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#a3a3a3',
+  },
+  duration: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  durationText: {
+    marginLeft: 4,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 24,
+  },
+  playButton: {
+    backgroundColor: '#22c55e',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  playText: {
+    marginLeft: 8,
+  },
+  iconButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  descriptionSection: {
+    width: '100%',
+  },
+  descriptionTitle: {
+    marginBottom: 12,
+  },
+  description: {
+    lineHeight: 20,
+  },
+})

@@ -3,7 +3,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ThemeProvider } from "@/contexts/theme-context"
 import { PlayerProvider } from "@/contexts/player-context"
 import { StatusBar } from "expo-status-bar"
-import "./global.css"
 import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from "@expo-google-fonts/inter"
 import { SafeAreaProvider } from "react-native-safe-area-context"
 

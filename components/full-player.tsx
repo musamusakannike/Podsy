@@ -1,6 +1,6 @@
 "use client"
 
-import { View, Image, Dimensions } from "react-native"
+import { View, Image, Dimensions, StyleSheet } from "react-native"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
 import { usePlayer } from "@/contexts/player-context"
@@ -38,42 +38,45 @@ export function FullPlayer({ onClose }: FullPlayerProps) {
 
   if (!currentEpisode) return null
 
+  const backgroundColor = theme === "dark" ? '#141414' : '#fafafa'
+  const iconColor = theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"
+  const mutedIconColor = theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"
+
   return (
-    <View className={`flex-1 ${theme === "dark" ? "bg-background" : "bg-background"} px-6 `}>
+    <View style={[styles.container, { backgroundColor }]}>
       {/* Header */}
-      <View className="flex-row items-center justify-between mb-8">
+      <View style={styles.header}>
         <HapticPressable onPress={onClose} haptic="selection">
-          <ChevronDown size={28} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
+          <ChevronDown size={28} color={iconColor} />
         </HapticPressable>
-        <Text className="text-sm font-medium">Now Playing</Text>
+        <Text size="sm" weight="semibold">Now Playing</Text>
         <HapticPressable haptic="light">
-          <Share2 size={24} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
+          <Share2 size={24} color={iconColor} />
         </HapticPressable>
       </View>
 
       {/* Album Art */}
-      <View className="items-center mb-8">
+      <View style={styles.albumArtContainer}>
         <Animated.View style={imageStyle}>
           <Image
             source={{ uri: currentEpisode.images[0]?.url }}
-            style={{ width: width - 80, height: width - 80 }}
-            className="rounded-2xl"
+            style={[styles.albumArt, { width: width - 80, height: width - 80 }]}
           />
         </Animated.View>
       </View>
 
       {/* Episode Info */}
-      <View className="mb-6">
-        <Text className="text-2xl font-bold mb-2" numberOfLines={2}>
+      <View style={styles.episodeInfo}>
+        <Text size="2xl" weight="bold" style={styles.episodeTitle} numberOfLines={2}>
           {currentEpisode.name}
         </Text>
-        <Text className="text-base text-muted-foreground" numberOfLines={1}>
+        <Text size="base" variant="muted" numberOfLines={1}>
           {currentEpisode.show?.name}
         </Text>
       </View>
 
       {/* Progress Bar */}
-      <View className="mb-2">
+      <View style={styles.sliderContainer}>
         <Slider
           value={position}
           minimumValue={0}
@@ -86,24 +89,24 @@ export function FullPlayer({ onClose }: FullPlayerProps) {
       </View>
 
       {/* Time Labels */}
-      <View className="flex-row justify-between mb-8">
-        <Text className="text-xs text-muted-foreground">{formatTime(position)}</Text>
-        <Text className="text-xs text-muted-foreground">{formatTime(duration)}</Text>
+      <View style={styles.timeLabels}>
+        <Text size="xs" variant="muted">{formatTime(position)}</Text>
+        <Text size="xs" variant="muted">{formatTime(duration)}</Text>
       </View>
 
       {/* Controls */}
-      <View className="flex-row items-center justify-between mb-8">
+      <View style={styles.controls}>
         <HapticPressable haptic="selection">
-          <Shuffle size={24} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
+          <Shuffle size={24} color={mutedIconColor} />
         </HapticPressable>
 
         <HapticPressable haptic="light">
-          <SkipBack size={32} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
+          <SkipBack size={32} color={iconColor} />
         </HapticPressable>
 
         <HapticPressable
           onPress={isPlaying ? pauseEpisode : resumeEpisode}
-          className="w-20 h-20 bg-primary rounded-full items-center justify-center"
+          style={styles.playButton}
           haptic="heavy"
         >
           {isPlaying ? (
@@ -114,20 +117,79 @@ export function FullPlayer({ onClose }: FullPlayerProps) {
         </HapticPressable>
 
         <HapticPressable haptic="light">
-          <SkipForward size={32} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
+          <SkipForward size={32} color={iconColor} />
         </HapticPressable>
 
         <HapticPressable haptic="selection">
-          <Repeat size={24} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
+          <Repeat size={24} color={mutedIconColor} />
         </HapticPressable>
       </View>
 
       {/* Bottom Actions */}
-      <View className="flex-row items-center justify-center">
-        <HapticPressable className="w-12 h-12 items-center justify-center" haptic="light">
-          <Heart size={24} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
+      <View style={styles.bottomActions}>
+        <HapticPressable style={styles.heartButton} haptic="light">
+          <Heart size={24} color={iconColor} />
         </HapticPressable>
       </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 32,
+  },
+  albumArtContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  albumArt: {
+    borderRadius: 16,
+  },
+  episodeInfo: {
+    marginBottom: 24,
+  },
+  episodeTitle: {
+    marginBottom: 8,
+  },
+  sliderContainer: {
+    marginBottom: 8,
+  },
+  timeLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 32,
+  },
+  controls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 32,
+  },
+  playButton: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#22c55e',
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heartButton: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+})

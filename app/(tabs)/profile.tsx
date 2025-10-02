@@ -1,12 +1,13 @@
 "use client"
 
-import { View, ScrollView } from "react-native"
+import { View, ScrollView, StyleSheet } from "react-native"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
 import { User, Moon, Sun, Bell, Download, Info, HelpCircle, LogOut, ChevronRight } from "lucide-react-native"
 import { HapticPressable } from "@/components/ui/pressable"
 import Animated, { FadeInUp } from "react-native-reanimated"
+
 export default function ProfileScreen() {
   const { theme, themeMode, setTheme } = useTheme()
 
@@ -37,94 +38,110 @@ export default function ProfileScreen() {
     },
   ]
 
+  const cardBg = theme === "dark" ? '#1c1c1c' : '#ffffff'
+  const borderColor = theme === "dark" ? '#262626' : '#e5e5e5'
+  const iconColor = theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"
+  const mutedIconColor = theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"
+  const mutedBorderColor = theme === "dark" ? '#a3a3a3' : '#737373'
+
   return (
-    <Container className="flex-1">
+    <Container style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="px-6 pb-6">
-          <Text className="text-3xl font-bold">Profile</Text>
+        <View style={styles.header}>
+          <Text size="3xl" weight="bold">Profile</Text>
         </View>
 
         {/* User Info */}
-        <View className="px-6 mb-6">
-          <View
-            className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-6 border ${theme === "dark" ? "border-border" : "border-border"} items-center`}
-          >
-            <View className="w-24 h-24 bg-primary rounded-full items-center justify-center mb-4">
+        <View style={styles.section}>
+          <View style={[styles.userCard, { backgroundColor: cardBg, borderColor }]}>
+            <View style={styles.avatar}>
               <User size={48} color="rgb(10, 10, 10)" />
             </View>
-            <Text className="text-xl font-bold">Guest User</Text>
-            <Text className="text-sm text-muted-foreground mt-1">guest@podcastapp.com</Text>
+            <Text size="xl" weight="bold">Guest User</Text>
+            <Text size="sm" variant="muted" style={styles.email}>guest@podcastapp.com</Text>
           </View>
         </View>
 
         {/* Theme Settings */}
-        <View className="px-6 mb-6">
-          <Text className="text-lg font-semibold mb-3">Appearance</Text>
-          <View
-            className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg border ${theme === "dark" ? "border-border" : "border-border"}`}
-          >
+        <View style={styles.section}>
+          <Text size="lg" weight="semibold" style={styles.sectionTitle}>Appearance</Text>
+          <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
             <HapticPressable
               onPress={() => setTheme("light")}
-              className="flex-row items-center justify-between p-4 border-b border-border"
+              style={[styles.option, { borderBottomColor: borderColor }]}
               haptic="selection"
             >
-              <View className="flex-row items-center flex-1">
-                <Sun size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-                <Text className="ml-3 font-medium">Light Mode</Text>
+              <View style={styles.optionContent}>
+                <Sun size={20} color={iconColor} />
+                <Text weight="semibold" style={styles.optionText}>Light Mode</Text>
               </View>
-              <View
-                className={`w-5 h-5 rounded-full border-2 ${themeMode === "light" ? "border-primary bg-primary" : "border-muted-foreground"}`}
-              />
+              <View style={[
+                styles.radio,
+                themeMode === "light" 
+                  ? { borderColor: '#22c55e', backgroundColor: '#22c55e' }
+                  : { borderColor: mutedBorderColor }
+              ]} />
             </HapticPressable>
 
             <HapticPressable
               onPress={() => setTheme("dark")}
-              className="flex-row items-center justify-between p-4 border-b border-border"
+              style={[styles.option, { borderBottomColor: borderColor }]}
               haptic="selection"
             >
-              <View className="flex-row items-center flex-1">
-                <Moon size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-                <Text className="ml-3 font-medium">Dark Mode</Text>
+              <View style={styles.optionContent}>
+                <Moon size={20} color={iconColor} />
+                <Text weight="semibold" style={styles.optionText}>Dark Mode</Text>
               </View>
-              <View
-                className={`w-5 h-5 rounded-full border-2 ${themeMode === "dark" ? "border-primary bg-primary" : "border-muted-foreground"}`}
-              />
+              <View style={[
+                styles.radio,
+                themeMode === "dark" 
+                  ? { borderColor: '#22c55e', backgroundColor: '#22c55e' }
+                  : { borderColor: mutedBorderColor }
+              ]} />
             </HapticPressable>
 
-            <HapticPressable onPress={() => setTheme("system")} className="flex-row items-center justify-between p-4" haptic="selection">
-              <View className="flex-row items-center flex-1">
-                <View className="w-5 h-5 rounded-full bg-gradient-to-r from-yellow-400 to-blue-900" />
-                <Text className="ml-3 font-medium">System Default</Text>
+            <HapticPressable 
+              onPress={() => setTheme("system")} 
+              style={styles.optionLast} 
+              haptic="selection"
+            >
+              <View style={styles.optionContent}>
+                <View style={styles.systemIcon} />
+                <Text weight="semibold" style={styles.optionText}>System Default</Text>
               </View>
-              <View
-                className={`w-5 h-5 rounded-full border-2 ${themeMode === "system" ? "border-primary bg-primary" : "border-muted-foreground"}`}
-              />
+              <View style={[
+                styles.radio,
+                themeMode === "system" 
+                  ? { borderColor: '#22c55e', backgroundColor: '#22c55e' }
+                  : { borderColor: mutedBorderColor }
+              ]} />
             </HapticPressable>
           </View>
         </View>
 
         {/* Settings */}
-        <View className="px-6 mb-6">
-          <Text className="text-lg font-semibold mb-3">Settings</Text>
-          <View
-            className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg border ${theme === "dark" ? "border-border" : "border-border"}`}
-          >
+        <View style={styles.section}>
+          <Text size="lg" weight="semibold" style={styles.sectionTitle}>Settings</Text>
+          <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
             {settingsItems.map((item, index) => (
               <Animated.View key={item.title} entering={FadeInUp.delay(index * 40)}>
                 <HapticPressable
                   onPress={item.onPress}
-                  className={`flex-row items-center justify-between p-4 ${index < settingsItems.length - 1 ? "border-b border-border" : ""}`}
+                  style={[
+                    styles.settingsOption,
+                    index < settingsItems.length - 1 && { borderBottomColor: borderColor, borderBottomWidth: 1 }
+                  ]}
                   haptic="selection"
                 >
-                  <View className="flex-row items-center flex-1">
-                    <item.icon size={20} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
-                    <View className="ml-3 flex-1">
-                      <Text className="font-medium">{item.title}</Text>
-                      <Text className="text-xs text-muted-foreground mt-1">{item.subtitle}</Text>
+                  <View style={styles.settingsContent}>
+                    <item.icon size={20} color={iconColor} />
+                    <View style={styles.settingsText}>
+                      <Text weight="semibold">{item.title}</Text>
+                      <Text size="xs" variant="muted" style={styles.settingsSubtitle}>{item.subtitle}</Text>
                     </View>
                   </View>
-                  <ChevronRight size={20} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
+                  <ChevronRight size={20} color={mutedIconColor} />
                 </HapticPressable>
               </Animated.View>
             ))}
@@ -132,16 +149,118 @@ export default function ProfileScreen() {
         </View>
 
         {/* Logout */}
-        <View className="px-6 pb-6">
+        <View style={styles.section}>
           <HapticPressable
-            className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"} flex-row items-center justify-center`}
+            style={[styles.logoutButton, { backgroundColor: cardBg, borderColor }]}
             haptic="medium"
           >
             <LogOut size={20} color="rgb(239, 68, 68)" />
-            <Text className="ml-2 font-semibold text-red-500">Log Out</Text>
+            <Text weight="semibold" style={styles.logoutText}>Log Out</Text>
           </HapticPressable>
         </View>
       </ScrollView>
     </Container>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  section: {
+    paddingHorizontal: 24,
+    marginBottom: 24,
+  },
+  userCard: {
+    borderRadius: 8,
+    padding: 24,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 96,
+    height: 96,
+    backgroundColor: '#22c55e',
+    borderRadius: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  email: {
+    marginTop: 4,
+  },
+  sectionTitle: {
+    marginBottom: 12,
+  },
+  card: {
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  optionLast: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  optionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  optionText: {
+    marginLeft: 12,
+  },
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+  },
+  systemIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#a3a3a3',
+  },
+  settingsOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
+  settingsContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  settingsText: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  settingsSubtitle: {
+    marginTop: 4,
+  },
+  logoutButton: {
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutText: {
+    marginLeft: 8,
+    color: 'rgb(239, 68, 68)',
+  },
+})

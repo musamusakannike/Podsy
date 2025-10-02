@@ -1,5 +1,6 @@
 "use client";
 
+import { StyleSheet } from "react-native";
 import { Tabs } from "expo-router";
 import { Home, Search, Library, User } from "lucide-react-native";
 import { useTheme } from "@/contexts/theme-context";
@@ -11,17 +12,17 @@ export default function TabsLayout() {
   const { theme } = useTheme();
   const iconColor = theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)";
   const activeColor = "rgb(34, 197, 94)";
+  const backgroundColor = theme === "dark" ? "rgb(20, 20, 20)" : "rgb(250, 250, 250)";
+  const borderTopColor = theme === "dark" ? "rgb(38, 38, 38)" : "rgb(229, 229, 229)";
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView style={styles.container}>
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor:
-              theme === "dark" ? "rgb(20, 20, 20)" : "rgb(250, 250, 250)",
-            borderTopColor:
-              theme === "dark" ? "rgb(38, 38, 38)" : "rgb(229, 229, 229)",
+            backgroundColor,
+            borderTopColor,
             borderTopWidth: 1,
           },
           tabBarActiveTintColor: activeColor,
@@ -71,3 +72,9 @@ export default function TabsLayout() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

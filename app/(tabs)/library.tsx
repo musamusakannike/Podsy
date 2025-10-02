@@ -1,6 +1,6 @@
 "use client"
 
-import { View, ScrollView, Image, ActivityIndicator } from "react-native"
+import { View, ScrollView, Image, ActivityIndicator, StyleSheet } from "react-native"
 import { useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
@@ -15,56 +15,60 @@ export default function LibraryScreen() {
   const { theme } = useTheme()
   const { data: savedShows, isLoading } = useSavedShows()
 
+  const cardBg = theme === "dark" ? '#1c1c1c' : '#ffffff'
+  const borderColor = theme === "dark" ? '#262626' : '#e5e5e5'
+  const emptyIconColor = theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"
+
   return (
-    <Container className="flex-1">
+    <Container style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="px-6 pb-6">
-          <Text className="text-3xl font-bold mb-4">Your Library</Text>
+        <View style={styles.header}>
+          <Text size="3xl" weight="bold" style={styles.title}>Your Library</Text>
 
           {/* Quick Actions */}
-          <View className="flex-row gap-3 mb-6">
-            <Animated.View entering={FadeInUp} className="flex-1">
+          <View style={styles.quickActions}>
+            <Animated.View entering={FadeInUp} style={styles.actionCard}>
               <HapticPressable
-                className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                style={[styles.actionButton, { backgroundColor: cardBg, borderColor }]}
                 haptic="selection"
               >
                 <BookMarked size={24} color="rgb(34, 197, 94)" />
-                <Text className="font-semibold mt-2">Saved</Text>
-                <Text className="text-xs text-muted-foreground mt-1">{savedShows?.length || 0} shows</Text>
+                <Text weight="semibold" style={styles.actionTitle}>Saved</Text>
+                <Text size="xs" variant="muted" style={styles.actionSubtitle}>{savedShows?.length || 0} shows</Text>
               </HapticPressable>
             </Animated.View>
 
-            <Animated.View entering={FadeInUp.delay(50)} className="flex-1">
+            <Animated.View entering={FadeInUp.delay(50)} style={styles.actionCard}>
               <HapticPressable
-                className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                style={[styles.actionButton, { backgroundColor: cardBg, borderColor }]}
                 haptic="selection"
               >
                 <Download size={24} color="rgb(34, 197, 94)" />
-                <Text className="font-semibold mt-2">Downloads</Text>
-                <Text className="text-xs text-muted-foreground mt-1">0 episodes</Text>
+                <Text weight="semibold" style={styles.actionTitle}>Downloads</Text>
+                <Text size="xs" variant="muted" style={styles.actionSubtitle}>0 episodes</Text>
               </HapticPressable>
             </Animated.View>
 
-            <Animated.View entering={FadeInUp.delay(100)} className="flex-1">
+            <Animated.View entering={FadeInUp.delay(100)} style={styles.actionCard}>
               <HapticPressable
-                className={`${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-4 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                style={[styles.actionButton, { backgroundColor: cardBg, borderColor }]}
                 haptic="selection"
               >
                 <Clock size={24} color="rgb(34, 197, 94)" />
-                <Text className="font-semibold mt-2">History</Text>
-                <Text className="text-xs text-muted-foreground mt-1">Recent</Text>
+                <Text weight="semibold" style={styles.actionTitle}>History</Text>
+                <Text size="xs" variant="muted" style={styles.actionSubtitle}>Recent</Text>
               </HapticPressable>
             </Animated.View>
           </View>
         </View>
 
         {/* Saved Shows */}
-        <View className="px-6 pb-6">
-          <Text className="text-xl font-bold mb-4">Saved Shows</Text>
+        <View style={styles.savedShows}>
+          <Text size="xl" weight="bold" style={styles.sectionTitle}>Saved Shows</Text>
 
           {isLoading ? (
-            <View className="items-center justify-center py-12">
+            <View style={styles.centerContainer}>
               <ActivityIndicator size="large" color="rgb(34, 197, 94)" />
             </View>
           ) : savedShows && savedShows.length > 0 ? (
@@ -73,28 +77,28 @@ export default function LibraryScreen() {
                 <Animated.View key={item.show.id} entering={FadeInUp.delay(i * 40)}>
                   <HapticPressable
                     onPress={() => router.push(`/podcast/${item.show.id}`)}
-                    className={`flex-row mb-4 ${theme === "dark" ? "bg-card" : "bg-card"} rounded-lg p-3 border ${theme === "dark" ? "border-border" : "border-border"}`}
+                    style={[styles.showCard, { backgroundColor: cardBg, borderColor }]}
                     haptic="light"
                   >
-                    <Image source={{ uri: item.show.images[0]?.url }} className="w-20 h-20 rounded-lg" />
-                    <View className="flex-1 ml-3 justify-center">
-                      <Text className="font-semibold text-base" numberOfLines={2}>
+                    <Image source={{ uri: item.show.images[0]?.url }} style={styles.showImage} />
+                    <View style={styles.showInfo}>
+                      <Text weight="semibold" size="base" numberOfLines={2}>
                         {item.show.name}
                       </Text>
-                      <Text className="text-sm text-muted-foreground mt-1" numberOfLines={1}>
+                      <Text size="sm" variant="muted" style={styles.publisher} numberOfLines={1}>
                         {item.show.publisher}
                       </Text>
-                      <Text className="text-xs text-muted-foreground mt-1">{item.show.total_episodes} episodes</Text>
+                      <Text size="xs" variant="muted" style={styles.episodes}>{item.show.total_episodes} episodes</Text>
                     </View>
                   </HapticPressable>
                 </Animated.View>
               ))}
             </Animated.View>
           ) : (
-            <View className="items-center justify-center py-12">
-              <BookMarked size={48} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
-              <Text className="text-muted-foreground mt-4 text-center">No saved shows yet</Text>
-              <Text className="text-sm text-muted-foreground mt-2 text-center">
+            <View style={styles.emptyState}>
+              <BookMarked size={48} color={emptyIconColor} />
+              <Text variant="muted" style={styles.emptyText}>No saved shows yet</Text>
+              <Text size="sm" variant="muted" style={styles.emptySubtext}>
                 Start exploring and save your favorite podcasts
               </Text>
             </View>
@@ -104,3 +108,83 @@ export default function LibraryScreen() {
     </Container>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  title: {
+    marginBottom: 16,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 24,
+  },
+  actionCard: {
+    flex: 1,
+  },
+  actionButton: {
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+  },
+  actionTitle: {
+    marginTop: 8,
+  },
+  actionSubtitle: {
+    marginTop: 4,
+  },
+  savedShows: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+  },
+  sectionTitle: {
+    marginBottom: 16,
+  },
+  centerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  showCard: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+  },
+  showImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  showInfo: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
+  publisher: {
+    marginTop: 4,
+  },
+  episodes: {
+    marginTop: 4,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  emptySubtext: {
+    marginTop: 8,
+    textAlign: 'center',
+  },
+})

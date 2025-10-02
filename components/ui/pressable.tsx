@@ -8,20 +8,19 @@ import * as Haptics from "expo-haptics"
 export type HapticStrength = "none" | "selection" | "light" | "medium" | "heavy"
 
 interface HapticPressableProps extends PressableProps {
-  className?: string
   haptic?: HapticStrength
   scaleTo?: number
   children?: React.ReactNode
 }
 
 export function HapticPressable({
-  className,
   haptic = "selection",
   scaleTo = 0.96,
   onPressIn,
   onPressOut,
   onPress,
   children,
+  style,
   ...rest
 }: HapticPressableProps) {
   const scale = useSharedValue(1)
@@ -48,7 +47,7 @@ export function HapticPressable({
   return (
     <Animated.View style={containerStyle}>
       <Pressable
-        className={className}
+        style={style}
         onPressIn={(e: GestureResponderEvent) => {
           scale.value = withSpring(scaleTo, { mass: 0.2, stiffness: 500, damping: 25 })
           onPressIn?.(e)

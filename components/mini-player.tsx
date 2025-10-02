@@ -1,6 +1,6 @@
 "use client"
 
-import { View, Image } from "react-native"
+import { View, Image, StyleSheet } from "react-native"
 import { useRouter } from "expo-router"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
@@ -34,37 +34,41 @@ export function MiniPlayer() {
 
   if (!currentEpisode) return null
 
+  const cardBg = theme === "dark" ? '#1c1c1c' : '#ffffff'
+  const borderColor = theme === "dark" ? '#262626' : '#e5e5e5'
+  const mutedBg = theme === "dark" ? '#262626' : '#e5e5e5'
+
   return (
     <Animated.View
       entering={FadeInDown}
       exiting={FadeOutDown}
-      className={`absolute bottom-16 left-0 right-0 ${theme === "dark" ? "bg-card" : "bg-card"} border-t ${theme === "dark" ? "border-border" : "border-border"}`}
+      style={[styles.container, { backgroundColor: cardBg, borderTopColor: borderColor }]}
     >
       {/* Progress Bar */}
-      <View className="h-1 bg-muted">
-        <Animated.View style={progressStyle} className="h-full bg-primary" />
+      <View style={[styles.progressBar, { backgroundColor: mutedBg }]}>
+        <Animated.View style={[progressStyle, styles.progressFill]} />
       </View>
 
       <HapticPressable
         onPress={() => router.push(`/episode/${currentEpisode.id}`)}
-        className="flex-row items-center px-4 py-3"
+        style={styles.content}
         haptic="selection"
       >
-        <Image source={{ uri: currentEpisode.images[0]?.url }} className="w-12 h-12 rounded-lg" />
+        <Image source={{ uri: currentEpisode.images[0]?.url }} style={styles.image} />
 
-        <View className="flex-1 ml-3">
-          <Text className="font-semibold text-sm" numberOfLines={1}>
+        <View style={styles.textContainer}>
+          <Text weight="semibold" size="sm" numberOfLines={1}>
             {currentEpisode.name}
           </Text>
-          <Text className="text-xs text-muted-foreground" numberOfLines={1}>
+          <Text size="xs" variant="muted" numberOfLines={1}>
             {currentEpisode.show?.name}
           </Text>
         </View>
 
-        <View className="flex-row items-center gap-2">
+        <View style={styles.controls}>
           <HapticPressable
             onPress={isPlaying ? pauseEpisode : resumeEpisode}
-            className="w-10 h-10 items-center justify-center"
+            style={styles.controlButton}
             haptic="light"
           >
             {isPlaying ? (
@@ -82,7 +86,7 @@ export function MiniPlayer() {
             )}
           </HapticPressable>
 
-          <HapticPressable onPress={stopEpisode} className="w-10 h-10 items-center justify-center" haptic="light">
+          <HapticPressable onPress={stopEpisode} style={styles.controlButton} haptic="light">
             <X size={20} color={theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"} />
           </HapticPressable>
         </View>
@@ -90,3 +94,46 @@ export function MiniPlayer() {
     </Animated.View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    bottom: 64,
+    left: 0,
+    right: 0,
+    borderTopWidth: 1,
+  },
+  progressBar: {
+    height: 4,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#22c55e',
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  image: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+  },
+  textContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  controls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  controlButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+})
