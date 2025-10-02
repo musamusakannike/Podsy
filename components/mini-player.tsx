@@ -16,7 +16,11 @@ import Animated, {
 import { useEffect } from "react"
 import { HapticPressable } from "@/components/ui/pressable"
 
-export function MiniPlayer() {
+interface MiniPlayerProps {
+  onOpenFull?: () => void
+}
+
+export function MiniPlayer({ onOpenFull }: MiniPlayerProps) {
   const { theme } = useTheme()
   const { currentEpisode, isPlaying, pauseEpisode, resumeEpisode, stopEpisode, position, duration } = usePlayer()
   const router = useRouter()
@@ -50,7 +54,13 @@ export function MiniPlayer() {
       </View>
 
       <HapticPressable
-        onPress={() => router.push(`/episode/${currentEpisode.id}`)}
+        onPress={() => {
+          if (onOpenFull) {
+            onOpenFull()
+          } else {
+            router.push(`/episode/${currentEpisode.id}`)
+          }
+        }}
         style={styles.content}
         haptic="selection"
       >
@@ -137,3 +147,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 })
+

@@ -4,7 +4,6 @@ import { StyleSheet } from "react-native";
 import { Tabs } from "expo-router";
 import { Home, Search, Library, User } from "lucide-react-native";
 import { useTheme } from "@/contexts/theme-context";
-import { MiniPlayer } from "@/components/mini-player";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 
@@ -68,7 +67,6 @@ export default function TabsLayout() {
           }}
         />
       </Tabs>
-      <MiniPlayer />
     </SafeAreaView>
   );
 }
@@ -78,3 +76,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+

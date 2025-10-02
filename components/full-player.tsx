@@ -9,6 +9,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-na
 import { useEffect } from "react"
 import Slider from "@react-native-community/slider"
 import { HapticPressable } from "@/components/ui/pressable"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const { width } = Dimensions.get("window")
 
@@ -43,7 +44,7 @@ export function FullPlayer({ onClose }: FullPlayerProps) {
   const mutedIconColor = theme === "dark" ? "rgb(163, 163, 163)" : "rgb(115, 115, 115)"
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor }]}>
       {/* Header */}
       <View style={styles.header}>
         <HapticPressable onPress={onClose} haptic="selection">
@@ -131,7 +132,7 @@ export function FullPlayer({ onClose }: FullPlayerProps) {
           <Heart size={24} color={iconColor} />
         </HapticPressable>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
