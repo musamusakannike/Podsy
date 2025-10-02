@@ -4,14 +4,12 @@ import { View, ScrollView, TouchableOpacity, Image, ActivityIndicator } from "re
 import { useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
-import { useTheme } from "@/contexts/theme-context"
 import { useQuery } from "@tanstack/react-query"
 import { spotifyApi } from "@/lib/spotify"
 import { TrendingUp, Clock, Sparkles } from "lucide-react-native"
 
 export default function HomeScreen() {
   const router = useRouter()
-  const { theme } = useTheme()
 
   const { data: featured, isLoading: featuredLoading } = useQuery({
     queryKey: ["featured-podcasts"],
@@ -78,7 +76,7 @@ export default function HomeScreen() {
         {/* Header */}
         <View className="px-6 pt-12 pb-6">
           <Text className="text-3xl font-bold">Discover</Text>
-          <Text className="text-muted-foreground mt-1">Explore podcasts you'll love</Text>
+          <Text className="text-muted-foreground mt-1">Explore podcasts you&apos;ll love</Text>
         </View>
 
         {/* Featured Section */}
