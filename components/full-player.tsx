@@ -38,7 +38,7 @@ export function FullPlayer({ onClose }: FullPlayerProps) {
   if (!currentEpisode) return null
 
   return (
-    <View className={`flex-1 ${theme === "dark" ? "bg-background" : "bg-background"} px-6 pt-12`}>
+    <View className={`flex-1 ${theme === "dark" ? "bg-background" : "bg-background"} px-6 `}>
       {/* Header */}
       <View className="flex-row items-center justify-between mb-8">
         <TouchableOpacity onPress={onClose}>

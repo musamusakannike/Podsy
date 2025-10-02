@@ -74,7 +74,7 @@ export default function HomeScreen() {
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="px-6 pt-12 pb-6">
+        <View className="px-6 pb-6">
           <Text className="text-3xl font-bold">Discover</Text>
           <Text className="text-muted-foreground mt-1">Explore podcasts you&apos;ll love</Text>
         </View>

@@ -21,7 +21,7 @@ export default function SearchScreen() {
 
   return (
     <Container className="flex-1">
-      <View className="px-6 pt-12 pb-4">
+      <View className="px-6 pb-4">
         <Text className="text-3xl font-bold mb-4">Search</Text>
 
         {/* Search Input */}

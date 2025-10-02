@@ -53,7 +53,7 @@ export default function EpisodeScreen() {
   return (
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="px-6 pt-12 pb-6">
+        <View className="px-6 pb-6">
           <TouchableOpacity onPress={() => router.back()} className="mb-6">
             <ArrowLeft size={24} color={theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"} />
           </TouchableOpacity>

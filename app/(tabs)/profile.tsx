@@ -5,7 +5,6 @@ import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
 import { useTheme } from "@/contexts/theme-context"
 import { User, Moon, Sun, Bell, Download, Info, HelpCircle, LogOut, ChevronRight } from "lucide-react-native"
-
 export default function ProfileScreen() {
   const { theme, themeMode, setTheme } = useTheme()
 
@@ -40,7 +39,7 @@ export default function ProfileScreen() {
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="px-6 pt-12 pb-6">
+        <View className="px-6 pb-6">
           <Text className="text-3xl font-bold">Profile</Text>
         </View>
 

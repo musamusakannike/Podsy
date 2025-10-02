@@ -25,6 +25,7 @@ export default function AuthScreen() {
       // Navigate to main app
       router.replace("/(tabs)")
     } catch (error) {
+      console.log(error)
       Alert.alert("Error", "Failed to authenticate")
     }
   }

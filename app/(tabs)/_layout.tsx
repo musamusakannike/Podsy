@@ -1,24 +1,26 @@
-"use client"
+"use client";
 
-import { Tabs } from "expo-router"
-import { Home, Search, Library, User } from "lucide-react-native"
-import { useTheme } from "@/contexts/theme-context"
-import { MiniPlayer } from "@/components/mini-player"
-import { View } from "react-native"
+import { Tabs } from "expo-router";
+import { Home, Search, Library, User } from "lucide-react-native";
+import { useTheme } from "@/contexts/theme-context";
+import { MiniPlayer } from "@/components/mini-player";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabsLayout() {
-  const { theme } = useTheme()
-  const iconColor = theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)"
-  const activeColor = "rgb(34, 197, 94)"
+  const { theme } = useTheme();
+  const iconColor = theme === "dark" ? "rgb(250, 250, 250)" : "rgb(10, 10, 10)";
+  const activeColor = "rgb(34, 197, 94)";
 
   return (
-    <View className="flex-1">
+    <SafeAreaView className="flex-1">
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: theme === "dark" ? "rgb(20, 20, 20)" : "rgb(250, 250, 250)",
-            borderTopColor: theme === "dark" ? "rgb(38, 38, 38)" : "rgb(229, 229, 229)",
+            backgroundColor:
+              theme === "dark" ? "rgb(20, 20, 20)" : "rgb(250, 250, 250)",
+            borderTopColor:
+              theme === "dark" ? "rgb(38, 38, 38)" : "rgb(229, 229, 229)",
             borderTopWidth: 1,
           },
           tabBarActiveTintColor: activeColor,
@@ -36,14 +38,18 @@ export default function TabsLayout() {
           name="search"
           options={{
             title: "Search",
-            tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <Search size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
           name="library"
           options={{
             title: "Library",
-            tabBarIcon: ({ color, size }) => <Library size={size} color={color} />,
+            tabBarIcon: ({ color, size }) => (
+              <Library size={size} color={color} />
+            ),
           }}
         />
         <Tabs.Screen
@@ -55,6 +61,6 @@ export default function TabsLayout() {
         />
       </Tabs>
       <MiniPlayer />
-    </View>
-  )
+    </SafeAreaView>
+  );
 }

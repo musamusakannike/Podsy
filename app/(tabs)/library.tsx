@@ -18,7 +18,7 @@ export default function LibraryScreen() {
     <Container className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="px-6 pt-12 pb-6">
+        <View className="px-6 pb-6">
           <Text className="text-3xl font-bold mb-4">Your Library</Text>
 
           {/* Quick Actions */}
