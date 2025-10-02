@@ -1,15 +1,17 @@
 "use client"
 
-import { View, ScrollView, Image, StyleSheet } from "react-native"
+import { View, ScrollView, StyleSheet, RefreshControl, TextInput } from "react-native"
 import { useRouter } from "expo-router"
 import { Container } from "@/components/ui/container"
 import { Text } from "@/components/ui/text"
 import { useQuery } from "@tanstack/react-query"
-import { spotifyApi } from "@/lib/spotify"
-import { TrendingUp, Clock, Headphones, Star, Zap } from "lucide-react-native"
+import { spotifyApi, searchPodcasts } from "@/lib/spotify"
+import { TrendingUp, Clock, Headphones, Star, Zap, Search, X } from "lucide-react-native"
 import { HapticPressable } from "@/components/ui/pressable"
 import Animated, { FadeInUp, FadeInDown, FadeIn } from "react-native-reanimated"
 import { LinearGradient } from "expo-linear-gradient"
+import { Image } from "expo-image"
+import { useState, useCallback } from "react"
 
 // Skeleton Components
 const SkeletonCard = ({ size }: { size: "large" | "small" }) => (
@@ -34,8 +36,11 @@ const SkeletonHero = () => (
 
 export default function HomeScreen() {
   const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isSearchActive, setIsSearchActive] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
-  const { data: featured, isLoading: featuredLoading } = useQuery({
+  const { data: featured, isLoading: featuredLoading, refetch: refetchFeatured } = useQuery({
     queryKey: ["featured-podcasts"],
     queryFn: async () => {
       const response = await spotifyApi.get("/shows", {
@@ -47,7 +52,7 @@ export default function HomeScreen() {
     },
   })
 
-  const { data: trending, isLoading: trendingLoading } = useQuery({
+  const { data: trending, isLoading: trendingLoading, refetch: refetchTrending } = useQuery({
     queryKey: ["trending-podcasts"],
     queryFn: async () => {
       const response = await spotifyApi.get("/search", {
@@ -61,7 +66,7 @@ export default function HomeScreen() {
     },
   })
 
-  const { data: recent, isLoading: recentLoading } = useQuery({
+  const { data: recent, isLoading: recentLoading, refetch: refetchRecent } = useQuery({
     queryKey: ["recent-podcasts"],
     queryFn: async () => {
       const response = await spotifyApi.get("/search", {
@@ -75,7 +80,7 @@ export default function HomeScreen() {
     },
   })
 
-  const { data: popular, isLoading: popularLoading } = useQuery({
+  const { data: popular, isLoading: popularLoading, refetch: refetchPopular } = useQuery({
     queryKey: ["popular-podcasts"],
     queryFn: async () => {
       const response = await spotifyApi.get("/search", {
@@ -89,7 +94,7 @@ export default function HomeScreen() {
     },
   })
 
-  const { data: topPicks, isLoading: topPicksLoading } = useQuery({
+  const { data: topPicks, isLoading: topPicksLoading, refetch: refetchTopPicks } = useQuery({
     queryKey: ["top-picks"],
     queryFn: async () => {
       const response = await spotifyApi.get("/search", {
@@ -102,6 +107,40 @@ export default function HomeScreen() {
       return response.data.shows.items
     },
   })
+
+  const { data: searchResults, isLoading: searchLoading } = useQuery({
+    queryKey: ["search-podcasts", searchQuery],
+    queryFn: async () => {
+      if (!searchQuery.trim()) return []
+      return await searchPodcasts(searchQuery)
+    },
+    enabled: searchQuery.trim().length > 0,
+  })
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true)
+    try {
+      await Promise.all([
+        refetchFeatured(),
+        refetchTrending(),
+        refetchRecent(),
+        refetchPopular(),
+        refetchTopPicks(),
+      ])
+    } finally {
+      setRefreshing(false)
+    }
+  }, [refetchFeatured, refetchTrending, refetchRecent, refetchPopular, refetchTopPicks])
+
+  const handleSearchChange = (text: string) => {
+    setSearchQuery(text)
+    setIsSearchActive(text.trim().length > 0)
+  }
+
+  const clearSearch = () => {
+    setSearchQuery("")
+    setIsSearchActive(false)
+  }
 
   const renderHeroCard = (podcast: any) => (
     <Animated.View
@@ -116,6 +155,9 @@ export default function HomeScreen() {
         <Image
           source={{ uri: podcast.images[0]?.url }}
           style={styles.heroImage}
+          contentFit="cover"
+          transition={200}
+          cachePolicy="memory-disk"
         />
         <LinearGradient
           colors={['transparent', 'rgba(0,0,0,0.9)']}
@@ -154,6 +196,9 @@ export default function HomeScreen() {
           <Image
             source={{ uri: podcast.images[0]?.url }}
             style={size === "large" ? styles.imageLarge : styles.imageSmall}
+            contentFit="cover"
+            transition={200}
+            cachePolicy="memory-disk"
           />
         </View>
         <Text weight="semibold" size="sm" numberOfLines={2} style={styles.cardTitle}>
@@ -179,6 +224,9 @@ export default function HomeScreen() {
         <Image
           source={{ uri: podcast.images[0]?.url }}
           style={styles.compactImage}
+          contentFit="cover"
+          transition={200}
+          cachePolicy="memory-disk"
         />
         <View style={styles.compactContent}>
           <Text weight="semibold" size="sm" numberOfLines={2}>
@@ -194,7 +242,17 @@ export default function HomeScreen() {
 
   return (
     <Container style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#fff"
+            colors={["#fff"]}
+          />
+        }
+      >
         {/* Header */}
         <Animated.View entering={FadeInDown.springify()} style={styles.header}>
           <Text size="3xl" weight="bold">Discover</Text>
@@ -203,112 +261,166 @@ export default function HomeScreen() {
           </Text>
         </Animated.View>
 
-        {/* Hero Featured Section */}
-        <View style={styles.heroSection}>
-          {featuredLoading ? (
-            <SkeletonHero />
-          ) : (
-            featured?.[0] && renderHeroCard(featured[0])
-          )}
-        </View>
-
-        {/* Trending Section */}
-        <Animated.View entering={FadeInUp.delay(150)} style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.iconBadge}>
-              <TrendingUp size={18} color="rgb(34, 197, 94)" />
-            </View>
-            <Text size="xl" weight="bold" style={styles.sectionTitle}>
-              Trending Now
-            </Text>
+        {/* Search Bar */}
+        <Animated.View entering={FadeInDown.delay(50).springify()} style={styles.searchContainer}>
+          <View style={styles.searchBar}>
+            <Search size={20} color="rgba(255, 255, 255, 0.5)" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search podcasts..."
+              placeholderTextColor="rgba(255, 255, 255, 0.5)"
+              value={searchQuery}
+              onChangeText={handleSearchChange}
+              returnKeyType="search"
+            />
+            {searchQuery.length > 0 && (
+              <HapticPressable onPress={clearSearch} haptic="light">
+                <X size={20} color="rgba(255, 255, 255, 0.5)" />
+              </HapticPressable>
+            )}
           </View>
-          {trendingLoading ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-              {[...Array(5)].map((_, i) => (
-                <SkeletonCard key={i} size="small" />
-              ))}
-            </ScrollView>
-          ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-              {trending?.map((podcast: any, i: number) => renderPodcastCard(podcast, "small", i))}
-            </ScrollView>
-          )}
         </Animated.View>
 
-        {/* Top Picks Section */}
-        <Animated.View entering={FadeInUp.delay(200)} style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={[styles.iconBadge, styles.iconBadgeZap]}>
-              <Zap size={18} color="rgb(251, 191, 36)" />
-            </View>
-            <Text size="xl" weight="bold" style={styles.sectionTitle}>
-              Top Picks For You
+        {/* Search Results */}
+        {isSearchActive ? (
+          <View style={styles.searchResultsContainer}>
+            <Text size="lg" weight="semibold" style={styles.searchResultsTitle}>
+              Search Results
             </Text>
-          </View>
-          {topPicksLoading ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-              {[...Array(5)].map((_, i) => (
-                <SkeletonCard key={i} size="large" />
-              ))}
-            </ScrollView>
-          ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-              {topPicks?.map((podcast: any, i: number) => renderPodcastCard(podcast, "large", i))}
-            </ScrollView>
-          )}
-        </Animated.View>
-
-        {/* Popular Section - Grid Layout */}
-        <Animated.View entering={FadeInUp.delay(250)} style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={[styles.iconBadge, styles.iconBadgeHeadphones]}>
-              <Headphones size={18} color="rgb(168, 85, 247)" />
-            </View>
-            <Text size="xl" weight="bold" style={styles.sectionTitle}>
-              Popular Right Now
-            </Text>
-          </View>
-          {popularLoading ? (
-            <View style={styles.compactList}>
-              {[...Array(4)].map((_, i) => (
-                <View key={i} style={styles.compactCard}>
-                  <View style={[styles.compactImage, styles.skeleton]} />
-                  <View style={styles.compactContent}>
-                    <View style={[styles.skeletonText, { width: '80%' }]} />
-                    <View style={[styles.skeletonText, { width: '60%', marginTop: 4, height: 12 }]} />
+            {searchLoading ? (
+              <View style={styles.compactList}>
+                {[...Array(4)].map((_, i) => (
+                  <View key={i} style={styles.compactCard}>
+                    <View style={[styles.compactImage, styles.skeleton]} />
+                    <View style={styles.compactContent}>
+                      <View style={[styles.skeletonText, { width: '80%' }]} />
+                      <View style={[styles.skeletonText, { width: '60%', marginTop: 4, height: 12 }]} />
+                    </View>
                   </View>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View style={styles.compactList}>
-              {popular?.slice(0, 6).map((podcast: any, i: number) => renderCompactCard(podcast, i))}
-            </View>
-          )}
-        </Animated.View>
-
-        {/* Recently Added Section */}
-        <Animated.View entering={FadeInUp.delay(300)} style={[styles.section, styles.lastSection]}>
-          <View style={styles.sectionHeader}>
-            <View style={[styles.iconBadge, styles.iconBadgeClock]}>
-              <Clock size={18} color="rgb(59, 130, 246)" />
-            </View>
-            <Text size="xl" weight="bold" style={styles.sectionTitle}>
-              Recently Added
-            </Text>
+                ))}
+              </View>
+            ) : searchResults && searchResults.length > 0 ? (
+              <View style={styles.compactList}>
+                {searchResults.map((podcast: any, i: number) => renderCompactCard(podcast, i))}
+              </View>
+            ) : (
+              <View style={styles.emptyState}>
+                <Text variant="muted" style={styles.emptyStateText}>
+                  No podcasts found for &quot;{searchQuery}&quot;
+                </Text>
+              </View>
+            )}
           </View>
-          {recentLoading ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-              {[...Array(5)].map((_, i) => (
-                <SkeletonCard key={i} size="small" />
-              ))}
-            </ScrollView>
-          ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-              {recent?.map((podcast: any, i: number) => renderPodcastCard(podcast, "small", i))}
-            </ScrollView>
-          )}
-        </Animated.View>
+        ) : (
+          <>
+            {/* Hero Featured Section */}
+            <View style={styles.heroSection}>
+              {featuredLoading ? (
+                <SkeletonHero />
+              ) : (
+                featured?.[0] && renderHeroCard(featured[0])
+              )}
+            </View>
+
+            {/* Trending Section */}
+            <Animated.View entering={FadeInUp.delay(150)} style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.iconBadge}>
+                  <TrendingUp size={18} color="rgb(34, 197, 94)" />
+                </View>
+                <Text size="xl" weight="bold" style={styles.sectionTitle}>
+                  Trending Now
+                </Text>
+              </View>
+              {trendingLoading ? (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                  {[...Array(5)].map((_, i) => (
+                    <SkeletonCard key={i} size="small" />
+                  ))}
+                </ScrollView>
+              ) : (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                  {trending?.map((podcast: any, i: number) => renderPodcastCard(podcast, "small", i))}
+                </ScrollView>
+              )}
+            </Animated.View>
+
+            {/* Top Picks Section */}
+            <Animated.View entering={FadeInUp.delay(200)} style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={[styles.iconBadge, styles.iconBadgeZap]}>
+                  <Zap size={18} color="rgb(251, 191, 36)" />
+                </View>
+                <Text size="xl" weight="bold" style={styles.sectionTitle}>
+                  Top Picks For You
+                </Text>
+              </View>
+              {topPicksLoading ? (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                  {[...Array(5)].map((_, i) => (
+                    <SkeletonCard key={i} size="large" />
+                  ))}
+                </ScrollView>
+              ) : (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                  {topPicks?.map((podcast: any, i: number) => renderPodcastCard(podcast, "large", i))}
+                </ScrollView>
+              )}
+            </Animated.View>
+
+            {/* Popular Section - Grid Layout */}
+            <Animated.View entering={FadeInUp.delay(250)} style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <View style={[styles.iconBadge, styles.iconBadgeHeadphones]}>
+                  <Headphones size={18} color="rgb(168, 85, 247)" />
+                </View>
+                <Text size="xl" weight="bold" style={styles.sectionTitle}>
+                  Popular Right Now
+                </Text>
+              </View>
+              {popularLoading ? (
+                <View style={styles.compactList}>
+                  {[...Array(4)].map((_, i) => (
+                    <View key={i} style={styles.compactCard}>
+                      <View style={[styles.compactImage, styles.skeleton]} />
+                      <View style={styles.compactContent}>
+                        <View style={[styles.skeletonText, { width: '80%' }]} />
+                        <View style={[styles.skeletonText, { width: '60%', marginTop: 4, height: 12 }]} />
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <View style={styles.compactList}>
+                  {popular?.slice(0, 6).map((podcast: any, i: number) => renderCompactCard(podcast, i))}
+                </View>
+              )}
+            </Animated.View>
+
+            {/* Recently Added Section */}
+            <Animated.View entering={FadeInUp.delay(300)} style={[styles.section, styles.lastSection]}>
+              <View style={styles.sectionHeader}>
+                <View style={[styles.iconBadge, styles.iconBadgeClock]}>
+                  <Clock size={18} color="rgb(59, 130, 246)" />
+                </View>
+                <Text size="xl" weight="bold" style={styles.sectionTitle}>
+                  Recently Added
+                </Text>
+              </View>
+              {recentLoading ? (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                  {[...Array(5)].map((_, i) => (
+                    <SkeletonCard key={i} size="small" />
+                  ))}
+                </ScrollView>
+              ) : (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                  {recent?.map((podcast: any, i: number) => renderPodcastCard(podcast, "small", i))}
+                </ScrollView>
+              )}
+            </Animated.View>
+          </>
+        )}
       </ScrollView>
     </Container>
   )
@@ -320,11 +432,45 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 24,
-    paddingBottom: 20,
+    paddingBottom: 16,
     paddingTop: 8,
   },
   subtitle: {
     marginTop: 4,
+    fontSize: 16,
+  },
+  searchContainer: {
+    paddingHorizontal: 24,
+    marginBottom: 20,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 16,
+    padding: 0,
+  },
+  searchResultsContainer: {
+    paddingHorizontal: 24,
+    marginBottom: 32,
+  },
+  searchResultsTitle: {
+    marginBottom: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyStateText: {
     fontSize: 16,
   },
   heroSection: {
@@ -445,7 +591,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   compactList: {
-    paddingHorizontal: 24,
     gap: 12,
   },
   compactCard: {
@@ -469,7 +614,6 @@ const styles = StyleSheet.create({
   compactPublisher: {
     marginTop: 2,
   },
-  // Skeleton Styles
   skeleton: {
     backgroundColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: 8,
